@@ -43,11 +43,47 @@ TEST(CPU, Stack)
     ASSERT_EQ(cpu.pull16(), 0xFFFD);
 }
 
-TEST(CPU, BRK_00)
+TEST(CPU, BRK)
 {
     CPU cpu = CPU();
     cpu.exec(0x00);
     ASSERT_EQ(cpu.get_p() & FLAG_INTERRUPT, FLAG_INTERRUPT);
     ASSERT_EQ(cpu.pull8(), cpu.get_p());
     ASSERT_EQ(cpu.pull16(), BRK_00_LEN);
+}
+
+TEST(CPU, SEI)
+{
+    CPU cpu = CPU();
+    cpu.exec(0x78);
+    ASSERT_EQ(cpu.get_p() & FLAG_INTERRUPT, FLAG_INTERRUPT);
+    ASSERT_EQ(cpu.get_pc(), 1);
+}
+
+TEST(CPU, CLD)
+{
+    CPU cpu = CPU();
+    cpu.exec(0xD8);
+    ASSERT_EQ(cpu.get_p() & FLAG_DECIMAL, false);
+    ASSERT_EQ(cpu.get_pc(), 1);
+}
+
+TEST(CPU, LDA_Immediate)
+{
+    CPU cpu = CPU();
+    // Test negative flag
+    cpu.set_memb(0, 0xA9);
+    cpu.set_memb(1, 0xFF);
+    cpu.exec(0xA9);
+    ASSERT_EQ(cpu.get_a(), 0xFF);
+    ASSERT_EQ(cpu.get_p() & FLAG_NEGATIVE, false);
+    
+    // Test zero flag
+    cpu = CPU();
+    cpu.set_a(0xFF);
+    cpu.set_memb(0, 0xA9);
+    cpu.set_memb(1, 0x00);
+    cpu.exec(0xA9);
+    ASSERT_EQ(cpu.get_a(), 0x00);
+    ASSERT_EQ(cpu.get_p() & FLAG_ZERO, FLAG_ZERO);
 }

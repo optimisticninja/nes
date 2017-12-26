@@ -6,7 +6,7 @@ using namespace std;
 
 const uint16_t STACK_ADDR = 0x100;
 
-enum Flags : uint8_t {
+enum Flag : uint8_t {
     FLAG_CARRY       = 1 << 0,
     FLAG_ZERO        = 1 << 1,
     FLAG_INTERRUPT   = 1 << 2,
@@ -63,6 +63,22 @@ struct Regs {
     uint16_t    pc;     // Program counter
     uint8_t     s;      // Stack pointer
     uint8_t     p;      // Status register
+    
+    void        set_flag(Flag flag)
+    {
+        this->p |= flag;
+    }
+    
+    void        clear_flag(Flag flag)
+    {
+        this->p &= ~(flag);
+    }
+};
+
+struct InstructionInfo {
+    uint16_t    addr;
+    MappingMode mode = {};
+    uint8_t     opcode;
 };
 
 const size_t NUM_OPCODES = 256;
@@ -94,28 +110,46 @@ enum InstructionLength : uint8_t {
 class CPU
 {
 private:
-    Regs        regs;
-    uint8_t     mem[TOTAL_RAM_SIZE - 1];
-    uint8_t*    stack = &this->mem[STACK_ADDR];
-    uint8_t*    ram = &mem[0];
-    uint8_t*    mirror0 = ram + RAM_SIZE;
-    uint8_t*    mirror1 = mirror0 + RAM_MIRROR_SIZE;
-    uint8_t*    mirror2 = mirror1 + RAM_MIRROR_SIZE;
-    uint8_t*    ppu_reg = mirror2 + RAM_MIRROR_SIZE;
-    uint8_t*    ppu_reg_mirrors = ppu_reg + PPU_REGS_SIZE;
-    uint8_t*    apu_io_regs = ppu_reg_mirrors + PPU_REGS_SIZE * NUM_PPU_REGS_MIRRORS;
-    uint8_t*    apu_io_test_mode = apu_io_regs + APU_IO_REGS_SIZE;
-    uint8_t*    cartridge_space = apu_io_test_mode + APU_IO_TEST_MODE_SIZE;
+    Regs*           regs;
+    uint8_t         mem[TOTAL_RAM_SIZE - 1];
+    uint8_t*        stack = &this->mem[STACK_ADDR];
+    uint8_t*        ram = &mem[0];
+    uint8_t*        mirror0 = ram + RAM_SIZE;
+    uint8_t*        mirror1 = mirror0 + RAM_MIRROR_SIZE;
+    uint8_t*        mirror2 = mirror1 + RAM_MIRROR_SIZE;
+    uint8_t*        ppu_reg = mirror2 + RAM_MIRROR_SIZE;
+    uint8_t*        ppu_reg_mirrors = ppu_reg + PPU_REGS_SIZE;
+    uint8_t*        apu_io_regs = ppu_reg_mirrors + PPU_REGS_SIZE * NUM_PPU_REGS_MIRRORS;
+    uint8_t*        apu_io_test_mode = apu_io_regs + APU_IO_REGS_SIZE;
+    uint8_t*        cartridge_space = apu_io_test_mode + APU_IO_TEST_MODE_SIZE;
+    InstructionInfo curr_instr_info;
     
-    void        brk_00();
-    void        ora_01();
+    void        sei(InstructionInfo& info);
+    void        cld(InstructionInfo& info);
+    void        brk(InstructionInfo& info);
+    void        lda(InstructionInfo& info);
     
 public:
     CPU();
     ~CPU();
     
-    void (CPU::*opcodes[NUM_OPCODES])() = {
-        &CPU::brk_00, &CPU::ora_01
+    void (CPU::*opcodes[NUM_OPCODES])(InstructionInfo& info) = {
+        &CPU::brk, 0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0, // 0x00
+        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0, // 0x1F
+        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0, // 0x2F
+        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0, // 0x3F
+        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0, // 0x4F
+        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0, // 0x5F
+        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0, // 0x6F
+        0,         0, 0, 0, 0, 0, 0, 0, &CPU::sei,         0, 0, 0, 0, 0, 0, 0, // 0x7F
+        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0, // 0x8F
+        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0, // 0x9F
+        0,         0, 0, 0, 0, 0, 0, 0,         0, &CPU::lda, 0, 0, 0, 0, 0, 0, // 0xAF
+        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0, // 0xBF
+        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0, // 0xCF
+        0,         0, 0, 0, 0, 0, 0, 0, &CPU::cld,         0, 0, 0, 0, 0, 0, 0, // 0xDF
+        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0, // 0xEF
+        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0  // 0xFF
     };
     
     void        exec(uint8_t opcode);
@@ -128,6 +162,7 @@ public:
     uint16_t    pull16();
     
     uint8_t     get_a();
+    void        set_a(uint8_t a);
     uint8_t     get_x();
     uint8_t     get_y();
     uint16_t    get_pc();
