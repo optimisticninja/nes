@@ -119,7 +119,7 @@ const uint8_t INSTR_LEN[NUM_OPCODES] = {
 class CPU
 {
 private:
-    Regs*           regs;
+    Regs            regs;
     uint8_t         mem[TOTAL_RAM_SIZE - 1];
     uint8_t*        stack = &this->mem[STACK_ADDR];
     uint8_t*        ram = &mem[0];
@@ -182,9 +182,10 @@ public:
     uint8_t     get_s();
     uint8_t     get_p();
     
-    uint8_t*    get_mem8(size_t i);
+    uint8_t*    get_memptr(size_t i);
+    uint8_t     get_mem8(size_t i);
     void        set_mem8(size_t i, uint8_t val);
-    uint16_t*   get_mem16(size_t i);
+    uint16_t    get_mem16(size_t i);
     
     uint8_t*    get_ram();
     uint8_t*    get_mirror0();

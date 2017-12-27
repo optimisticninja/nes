@@ -6,18 +6,16 @@
 
 static const uint8_t FLAGS_IRQ_DISABLED = 0x34;
 
-CPU::CPU() :
-    regs(new Regs)
+CPU::CPU()
 {
-    regs->p = FLAGS_IRQ_DISABLED;
-    regs->a = regs->x = regs->y = 0;
-    regs->s = 0xFD;
-    this->regs->pc = 0x0000;
+    regs.p = FLAGS_IRQ_DISABLED;
+    regs.a = regs.x = regs.y = 0;
+    regs.s = 0xFD;
+    this->regs.pc = 0x0000;
 }
 
 CPU::~CPU()
 {
-    delete this->regs;
 }
 
 void CPU::exec(uint8_t opcode)
@@ -43,12 +41,12 @@ void CPU::exec(uint8_t opcode)
         case ACCUMULATOR:
             break;
         case IMMEDIATE:
-            address = this->regs->pc + 1;
+            address = this->regs.pc + 1;
             break;
         case ZERO:
             break;
         case ABSOLUTE:
-            address = *this->get_mem16(this->regs->pc + 1);
+            address = this->get_mem16(this->regs.pc + 1);
             break;
         case RELATIVE:
             break;
@@ -60,7 +58,7 @@ void CPU::exec(uint8_t opcode)
             break;
     };
     
-    this->regs->pc += INSTR_LEN[opcode];
+    this->regs.pc += INSTR_LEN[opcode];
     
     this->curr_instr_info.addr = address;
     this->curr_instr_info.mode = mode;
@@ -81,13 +79,13 @@ void CPU::handle_flags(uint8_t flags, uint8_t val)
     
     if (flags & FLAG_NEGATIVE)
         (val & 0x80) != 0 
-            ? this->regs->set_flag(FLAG_NEGATIVE) 
-            : this->regs->clear_flag(FLAG_NEGATIVE);
+            ? this->regs.set_flag(FLAG_NEGATIVE) 
+            : this->regs.clear_flag(FLAG_NEGATIVE);
     
     if (flags & FLAG_ZERO)
         val == 0 
-            ? this->regs->set_flag(FLAG_ZERO) 
-            : this->regs->clear_flag(FLAG_ZERO);
+            ? this->regs.set_flag(FLAG_ZERO) 
+            : this->regs.clear_flag(FLAG_ZERO);
         
     
     if (flags & FLAG_OVERFLOW) {
@@ -96,8 +94,8 @@ void CPU::handle_flags(uint8_t flags, uint8_t val)
 
 void CPU::push8(uint8_t val)
 {
-    this->stack[this->regs->s] = val;
-    this->regs->s--;
+    this->stack[this->regs.s] = val;
+    this->regs.s--;
 }
 
 void CPU::push16(uint16_t val)
@@ -110,8 +108,8 @@ void CPU::push16(uint16_t val)
 
 uint8_t CPU::pull8()
 {
-    this->regs->s++;
-    return this->stack[this->regs->s];
+    this->regs.s++;
+    return this->stack[this->regs.s];
 }
 
 uint16_t CPU::pull16()
@@ -123,84 +121,89 @@ uint16_t CPU::pull16()
 
 void CPU::brk(InstructionInfo& info)
 {
-//     this->regs->pc += 2;
-    this->push16(this->regs->pc);
-    this->push8(this->regs->p);
+//     this->regs.pc += 2;
+    this->push16(this->regs.pc);
+    this->push8(this->regs.p);
     this->sei(info);
-    this->regs->set_flag(FLAG_INTERRUPT);
-    this->regs->pc = *this->get_mem16(0xFFFE);
+    this->regs.set_flag(FLAG_INTERRUPT);
+    this->regs.pc = this->get_mem16(0xFFFE);
 }
 
 void CPU::sta(InstructionInfo& info)
 {
-    this->set_mem8(info.addr, this->regs->a);
+    this->set_mem8(info.addr, this->regs.a);
 }
 
 void CPU::sei(__attribute__((unused)) InstructionInfo& info)
 {
-    this->regs->set_flag(FLAG_INTERRUPT);
+    this->regs.set_flag(FLAG_INTERRUPT);
 }
 
 void CPU::cld(__attribute__((unused)) InstructionInfo& info)
 {
-    this->regs->clear_flag(FLAG_DECIMAL);
+    this->regs.clear_flag(FLAG_DECIMAL);
 }
 
 void CPU::lda(InstructionInfo& info)
 {
-    this->regs->a = *this->get_mem8(info.addr);
-    this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs->a);
+    this->regs.a = this->get_mem8(info.addr);
+    this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.a);
 }
 
 void CPU::ldx(InstructionInfo& info)
 {
-    this->regs->x = *this->get_mem8(info.addr);
-    this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs->x);
+    this->regs.x = this->get_mem8(info.addr);
+    this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.x);
 }
 
 uint8_t CPU::get_a()
 {
-    return this->regs->a;
+    return this->regs.a;
 }
 
 void CPU::set_a(uint8_t a)
 {
-    this->regs->a = a;
+    this->regs.a = a;
 }
 
 uint8_t CPU::get_x()
 {
-    return this->regs->x;
+    return this->regs.x;
 }
 
 void CPU::set_x(uint8_t x)
 {
-    this->regs->x = x;
+    this->regs.x = x;
 }
 
 uint8_t CPU::get_y()
 {
-    return this->regs->y;
+    return this->regs.y;
 }
 
 uint16_t CPU::get_pc()
 {
-    return this->regs->pc;
+    return this->regs.pc;
 }
 
 uint8_t CPU::get_s()
 {
-    return this->regs->s;
+    return this->regs.s;
 }
 
 uint8_t CPU::get_p()
 {
-    return this->regs->p;
+    return this->regs.p;
 }
 
-uint8_t * CPU::get_mem8(size_t i)
+uint8_t* CPU::get_memptr(size_t i)
 {
     return &this->mem[i];
+}
+
+uint8_t CPU::get_mem8(size_t i)
+{
+    return this->mem[i];
 }
 
 void CPU::set_mem8(size_t i, uint8_t val)
@@ -208,9 +211,9 @@ void CPU::set_mem8(size_t i, uint8_t val)
     this->mem[i] = val;
 }
 
-uint16_t* CPU::get_mem16(size_t i)
+uint16_t CPU::get_mem16(size_t i)
 {
-    return (uint16_t*) &this->mem[i];
+    return *((uint16_t*) &this->mem[i]);
 }
 
 uint8_t* CPU::get_apu_io_regs()
