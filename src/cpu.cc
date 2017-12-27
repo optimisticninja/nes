@@ -1,6 +1,8 @@
 #include "cpu.h"
 
-#include <iostream>
+#ifdef DEBUG
+    #include <iostream>
+#endif
 
 static const uint8_t FLAGS_IRQ_DISABLED = 0x34;
 
@@ -10,6 +12,7 @@ CPU::CPU() :
     regs->p = FLAGS_IRQ_DISABLED;
     regs->a = regs->x = regs->y = 0;
     regs->s = 0xFD;
+    this->regs->pc = 0x0000;
 }
 
 CPU::~CPU()
@@ -19,7 +22,7 @@ CPU::~CPU()
 
 void CPU::exec(uint8_t opcode)
 {
-    uint16_t address;
+    uint16_t address = 0x0000;
     MappingMode mode = MAPPING_MODES[opcode];
     
     switch (mode) {
@@ -45,6 +48,7 @@ void CPU::exec(uint8_t opcode)
         case ZERO:
             break;
         case ABSOLUTE:
+            address = *this->get_mem16(this->regs->pc + 1);
             break;
         case RELATIVE:
             break;
@@ -56,11 +60,34 @@ void CPU::exec(uint8_t opcode)
             break;
     };
     
+    this->regs->pc += INSTR_LEN[opcode];
+    
     this->curr_instr_info.addr = address;
     this->curr_instr_info.mode = mode;
     this->curr_instr_info.opcode = opcode;
-    
     (this->*opcodes[opcode])(this->curr_instr_info);
+}
+
+void CPU::handle_flags(uint8_t flags, uint8_t val)
+{
+    if (flags & FLAG_CARRY) {
+    }
+    
+    if (flags & FLAG_DECIMAL) {
+    }
+    
+    if (flags & FLAG_INTERRUPT) {
+    }
+    
+    if (flags & FLAG_NEGATIVE)
+        (val & 0x80) != 0 ? this->regs->set_flag(FLAG_NEGATIVE) : this->regs->clear_flag(FLAG_NEGATIVE);
+    
+    if (flags & FLAG_ZERO)
+        val == 0 ? this->regs->set_flag(FLAG_ZERO) : this->regs->clear_flag(FLAG_ZERO);
+        
+    
+    if (flags & FLAG_OVERFLOW) {
+    }
 }
 
 void CPU::push8(uint8_t val)
@@ -90,47 +117,37 @@ uint16_t CPU::pull16()
     return hi << 8 | lo;
 }
 
-void CPU::brk(__attribute__((unused)) InstructionInfo& info)
+void CPU::brk(InstructionInfo& info)
 {
-    this->regs->pc += BRK_00_LEN;
+//     this->regs->pc += 2;
     this->push16(this->regs->pc);
     this->push8(this->regs->p);
+    this->sei(info);
     this->regs->set_flag(FLAG_INTERRUPT);
-    this->regs->pc = (uint16_t) ((*this->get_memb(0xFFFE) << 8) | *this->get_memb(0xFFFF));
+    this->regs->pc = *this->get_mem16(0xFFFE);
+}
+
+void CPU::sta(InstructionInfo& info)
+{
+    this->set_mem8(info.addr, this->regs->a);
 }
 
 void CPU::sei(__attribute__((unused)) InstructionInfo& info)
 {
-    this->regs->pc += 1;
     this->regs->set_flag(FLAG_INTERRUPT);
 }
 
 void CPU::cld(__attribute__((unused)) InstructionInfo& info)
 {
-    this->regs->pc += 1;
+//     this->regs->pc += 1;
     this->regs->clear_flag(FLAG_DECIMAL);
 }
 
 void CPU::lda(InstructionInfo& info)
 {
-    this->regs->pc += 1;
-    
-    uint8_t immediate;
-    
-    switch (info.mode) {
-        case IMMEDIATE:
-            immediate = *this->get_memb(info.addr);
-            
-            if (immediate > 0x7F)
-                this->regs->clear_flag(FLAG_NEGATIVE);
-            else if (immediate == 0x00)
-                this->regs->set_flag(FLAG_ZERO);
-            
-            this->regs->a = immediate;
-            break;
-        default:
-            break;
-    }
+//     this->regs->pc += 1;
+    this->regs->a = *this->get_mem8(info.addr);
+    this->handle_flags(FLAG_ZERO | FLAG_DECIMAL, this->regs->a);
 }
 
 uint8_t CPU::get_a()
@@ -168,14 +185,19 @@ uint8_t CPU::get_p()
     return this->regs->p;
 }
 
-uint8_t * CPU::get_memb(size_t i)
+uint8_t * CPU::get_mem8(size_t i)
 {
     return &this->mem[i];
 }
 
-void CPU::set_memb(size_t i, uint8_t val)
+void CPU::set_mem8(size_t i, uint8_t val)
 {
     this->mem[i] = val;
+}
+
+uint16_t* CPU::get_mem16(size_t i)
+{
+    return (uint16_t*) &this->mem[i];
 }
 
 uint8_t* CPU::get_apu_io_regs()

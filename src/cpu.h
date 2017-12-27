@@ -64,15 +64,8 @@ struct Regs {
     uint8_t     s;      // Stack pointer
     uint8_t     p;      // Status register
     
-    void        set_flag(Flag flag)
-    {
-        this->p |= flag;
-    }
-    
-    void        clear_flag(Flag flag)
-    {
-        this->p &= ~(flag);
-    }
+    void        set_flag(Flag flag)   { this->p |= flag; }
+    void        clear_flag(Flag flag) { this->p &= ~(flag); }
 };
 
 struct InstructionInfo {
@@ -103,8 +96,24 @@ const MappingMode MAPPING_MODES[NUM_OPCODES] = {
      IMPLICIT, INDIRECT_Y,    NO_MAP, NO_MAP, NO_MAP, ZERO_X, ZERO_X, NO_MAP, IMPLICIT, ABSOLUTE_Y,      NO_MAP, NO_MAP,     NO_MAP, ABSOLUTE_X, ABSOLUTE_X, NO_MAP  // 0xFF
 };
 
-enum InstructionLength : uint8_t {
-    BRK_00_LEN = 2
+const uint8_t INSTR_LEN[NUM_OPCODES] = {
+/* 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F  */
+    1, 2, 0, 0, 2, 2, 2, 0, 1, 2, 1, 0, 3, 3, 3, 0, // 0x0F
+	2, 2, 0, 0, 2, 2, 2, 0, 1, 3, 1, 0, 3, 3, 3, 0, // 0x1F
+	3, 2, 0, 0, 2, 2, 2, 0, 1, 2, 1, 0, 3, 3, 3, 0, // 0x2F
+	2, 2, 0, 0, 2, 2, 2, 0, 1, 3, 1, 0, 3, 3, 3, 0, // 0x3F
+	1, 2, 0, 0, 2, 2, 2, 0, 1, 2, 1, 0, 3, 3, 3, 0, // 0x4F
+	2, 2, 0, 0, 2, 2, 2, 0, 1, 3, 1, 0, 3, 3, 3, 0, // 0x5F
+	1, 2, 0, 0, 2, 2, 2, 0, 1, 2, 1, 0, 3, 3, 3, 0, // 0x6F
+	2, 2, 0, 0, 2, 2, 2, 0, 1, 3, 1, 0, 3, 3, 3, 0, // 0x7F
+	2, 2, 0, 0, 2, 2, 2, 0, 1, 0, 1, 0, 3, 3, 3, 0, // 0x8F
+	2, 2, 0, 0, 2, 2, 2, 0, 1, 3, 1, 0, 0, 3, 0, 0, // 0x9F
+	2, 2, 2, 0, 2, 2, 2, 0, 1, 2, 1, 0, 3, 3, 3, 0, // 0xAF
+	2, 2, 0, 0, 2, 2, 2, 0, 1, 3, 1, 0, 3, 3, 3, 0, // 0xBF
+	2, 2, 0, 0, 2, 2, 2, 0, 1, 2, 1, 0, 3, 3, 3, 0, // 0xCF
+	2, 2, 0, 0, 2, 2, 2, 0, 1, 3, 1, 0, 3, 3, 3, 0, // 0xDF
+	2, 2, 0, 0, 2, 2, 2, 0, 1, 2, 1, 0, 3, 3, 3, 0, // 0xEF
+    2, 2, 0, 0, 2, 2, 2, 0, 1, 3, 1, 0, 3, 3, 3, 0  // 0xFF
 };
 
 class CPU
@@ -124,6 +133,7 @@ private:
     uint8_t*        cartridge_space = apu_io_test_mode + APU_IO_TEST_MODE_SIZE;
     InstructionInfo curr_instr_info;
     
+    void        sta(InstructionInfo& info);
     void        sei(InstructionInfo& info);
     void        cld(InstructionInfo& info);
     void        brk(InstructionInfo& info);
@@ -134,25 +144,26 @@ public:
     ~CPU();
     
     void (CPU::*opcodes[NUM_OPCODES])(InstructionInfo& info) = {
-        &CPU::brk, 0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0, // 0x00
-        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0, // 0x1F
-        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0, // 0x2F
-        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0, // 0x3F
-        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0, // 0x4F
-        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0, // 0x5F
-        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0, // 0x6F
-        0,         0, 0, 0, 0, 0, 0, 0, &CPU::sei,         0, 0, 0, 0, 0, 0, 0, // 0x7F
-        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0, // 0x8F
-        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0, // 0x9F
-        0,         0, 0, 0, 0, 0, 0, 0,         0, &CPU::lda, 0, 0, 0, 0, 0, 0, // 0xAF
-        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0, // 0xBF
-        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0, // 0xCF
-        0,         0, 0, 0, 0, 0, 0, 0, &CPU::cld,         0, 0, 0, 0, 0, 0, 0, // 0xDF
-        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0, // 0xEF
-        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, 0, 0, 0  // 0xFF
+        &CPU::brk, 0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0,         0, 0, 0, // 0x00
+        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0,         0, 0, 0, // 0x1F
+        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0,         0, 0, 0, // 0x2F
+        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0,         0, 0, 0, // 0x3F
+        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0,         0, 0, 0, // 0x4F
+        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0,         0, 0, 0, // 0x5F
+        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0,         0, 0, 0, // 0x6F
+        0,         0, 0, 0, 0, 0, 0, 0, &CPU::sei,         0, 0, 0, 0,         0, 0, 0, // 0x7F
+        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0, &CPU::sta, 0, 0, // 0x8F
+        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0,         0, 0, 0, // 0x9F
+        0,         0, 0, 0, 0, 0, 0, 0,         0, &CPU::lda, 0, 0, 0,         0, 0, 0, // 0xAF
+        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0,         0, 0, 0, // 0xBF
+        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0,         0, 0, 0, // 0xCF
+        0,         0, 0, 0, 0, 0, 0, 0, &CPU::cld,         0, 0, 0, 0,         0, 0, 0, // 0xDF
+        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0,         0, 0, 0, // 0xEF
+        0,         0, 0, 0, 0, 0, 0, 0,         0,         0, 0, 0, 0,         0, 0, 0  // 0xFF
     };
     
     void        exec(uint8_t opcode);
+    void        handle_flags(uint8_t flags, uint8_t val);
     
     /* STACK */
     void        push8(uint8_t val);
@@ -169,8 +180,9 @@ public:
     uint8_t     get_s();
     uint8_t     get_p();
     
-    uint8_t*    get_memb(size_t i);
-    void        set_memb(size_t i, uint8_t val);
+    uint8_t*    get_mem8(size_t i);
+    void        set_mem8(size_t i, uint8_t val);
+    uint16_t*   get_mem16(size_t i);
     
     uint8_t*    get_ram();
     uint8_t*    get_mirror0();
