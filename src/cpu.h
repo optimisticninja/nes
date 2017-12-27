@@ -133,42 +133,39 @@ private:
     uint8_t*        cartridge_space = apu_io_test_mode + APU_IO_TEST_MODE_SIZE;
     InstructionInfo curr_instr_info;
     
-    void        sta(InstructionInfo& info);
-    void        sei(InstructionInfo& info);
     void        cld(InstructionInfo& info);
     void        brk(InstructionInfo& info);
     void        lda(InstructionInfo& info);
     void        ldx(InstructionInfo& info);
+    void        ora(InstructionInfo& info);
+    void        sei(InstructionInfo& info);
+    void        sta(InstructionInfo& info);
     
 public:
     CPU();
     ~CPU();
     
     void (CPU::*opcodes[NUM_OPCODES])(InstructionInfo& info) = {
-    /*         00 01         02 03 04         05         06 07         08         09 0A 0B 0C         0D         0E 0F  */
-        &CPU::brk, 0,         0, 0, 0,         0,         0, 0,         0,         0, 0, 0, 0,         0,         0, 0, // 0x00
-        0,         0,         0, 0, 0,         0,         0, 0,         0,         0, 0, 0, 0,         0,         0, 0, // 0x1F
-        0,         0,         0, 0, 0,         0,         0, 0,         0,         0, 0, 0, 0,         0,         0, 0, // 0x2F
-        0,         0,         0, 0, 0,         0,         0, 0,         0,         0, 0, 0, 0,         0,         0, 0, // 0x3F
-        0,         0,         0, 0, 0,         0,         0, 0,         0,         0, 0, 0, 0,         0,         0, 0, // 0x4F
-        0,         0,         0, 0, 0,         0,         0, 0,         0,         0, 0, 0, 0,         0,         0, 0, // 0x5F
-        0,         0,         0, 0, 0,         0,         0, 0,         0,         0, 0, 0, 0,         0,         0, 0, // 0x6F
-        0,         0,         0, 0, 0,         0,         0, 0, &CPU::sei,         0, 0, 0, 0,         0,         0, 0, // 0x7F
-        0, &CPU::sta,         0, 0, 0, &CPU::sta,         0, 0,         0,         0, 0, 0, 0, &CPU::sta,         0, 0, // 0x8F
-        0, &CPU::sta,         0, 0, 0, &CPU::sta,         0, 0,         0, &CPU::sta, 0, 0, 0, &CPU::sta,         0, 0, // 0x9F
-        0, &CPU::lda, &CPU::ldx, 0, 0, &CPU::lda, &CPU::ldx, 0,         0, &CPU::lda, 0, 0, 0, &CPU::lda, &CPU::ldx, 0, // 0xAF
-        0, &CPU::lda,         0, 0, 0, &CPU::lda, &CPU::ldx, 0,         0, &CPU::lda, 0, 0, 0, &CPU::lda, &CPU::ldx, 0, // 0xBF
-        0,         0,         0, 0, 0,         0,         0, 0,         0,         0, 0, 0, 0,         0,         0, 0, // 0xCF
-        0,         0,         0, 0, 0,         0,         0, 0, &CPU::cld,         0, 0, 0, 0,         0,         0, 0, // 0xDF
-        0,         0,         0, 0, 0,         0,         0, 0,         0,         0, 0, 0, 0,         0,         0, 0, // 0xEF
-        0,         0,         0, 0, 0,         0,         0, 0,         0,         0, 0, 0, 0,         0,         0, 0  // 0xFF
+    /*         00         01         02 03 04         05         06 07         08         09 0A 0B 0C         0D         0E 0F  */
+        &CPU::brk, &CPU::ora,         0, 0, 0, &CPU::ora,         0, 0,         0, &CPU::ora, 0, 0, 0, &CPU::ora,         0, 0, // 0x00
+                0, &CPU::ora,         0, 0, 0, &CPU::ora,         0, 0,         0, &CPU::ora, 0, 0, 0, &CPU::ora,         0, 0, // 0x1F
+                0,         0,         0, 0, 0,         0,         0, 0,         0,         0, 0, 0, 0,         0,         0, 0, // 0x2F
+                0,         0,         0, 0, 0,         0,         0, 0,         0,         0, 0, 0, 0,         0,         0, 0, // 0x3F
+                0,         0,         0, 0, 0,         0,         0, 0,         0,         0, 0, 0, 0,         0,         0, 0, // 0x4F
+                0,         0,         0, 0, 0,         0,         0, 0,         0,         0, 0, 0, 0,         0,         0, 0, // 0x5F
+                0,         0,         0, 0, 0,         0,         0, 0,         0,         0, 0, 0, 0,         0,         0, 0, // 0x6F
+                0,         0,         0, 0, 0,         0,         0, 0, &CPU::sei,         0, 0, 0, 0,         0,         0, 0, // 0x7F
+                0, &CPU::sta,         0, 0, 0, &CPU::sta,         0, 0,         0,         0, 0, 0, 0, &CPU::sta,         0, 0, // 0x8F
+                0, &CPU::sta,         0, 0, 0, &CPU::sta,         0, 0,         0, &CPU::sta, 0, 0, 0, &CPU::sta,         0, 0, // 0x9F
+                0, &CPU::lda, &CPU::ldx, 0, 0, &CPU::lda, &CPU::ldx, 0,         0, &CPU::lda, 0, 0, 0, &CPU::lda, &CPU::ldx, 0, // 0xAF
+                0, &CPU::lda,         0, 0, 0, &CPU::lda, &CPU::ldx, 0,         0, &CPU::lda, 0, 0, 0, &CPU::lda, &CPU::ldx, 0, // 0xBF
+                0,         0,         0, 0, 0,         0,         0, 0,         0,         0, 0, 0, 0,         0,         0, 0, // 0xCF
+                0,         0,         0, 0, 0,         0,         0, 0, &CPU::cld,         0, 0, 0, 0,         0,         0, 0, // 0xDF
+                0,         0,         0, 0, 0,         0,         0, 0,         0,         0, 0, 0, 0,         0,         0, 0, // 0xEF
+                0,         0,         0, 0, 0,         0,         0, 0,         0,         0, 0, 0, 0,         0,         0, 0  // 0xFF
     };
 
-#ifdef DEBUG
-    InstructionInfo exec(uint8_t opcode);
-#else
     void        exec(uint8_t opcode);
-#endif
     void        handle_flags(uint8_t flags, uint8_t val);
     
     /* STACK */
@@ -183,6 +180,7 @@ public:
     uint8_t     get_x();
     void        set_x(uint8_t x);
     uint8_t     get_y();
+    void        set_y(uint8_t y);
     uint16_t    get_pc();
     uint8_t     get_s();
     uint8_t     get_p();

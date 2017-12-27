@@ -102,3 +102,33 @@ TEST(CPU, STA)
     ASSERT_EQ(cpu.get_mem8(0xFFFF), cpu.get_a());
     ASSERT_EQ(cpu.get_pc(), INSTR_LEN[0x8D]);
 }
+
+/* TODO: Finish mapping modes and extract out to stub to be used in all tests */
+TEST(CPU, ORA)
+{
+    uint8_t opcodes[8] = { 0x09, 0x05, 0x15, 0x0D, 0x1D, 0x19, 0x01, 0x11 };
+    CPU cpu;
+    cpu.set_mem8(0x0001, 0x0F);
+    const uint8_t EXPECTED = 0xF0 | 0x0F;
+        
+     for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
+        cout << hex << unsigned(opcodes[i]) << endl;
+        cpu = CPU();
+        cpu.set_a(0xF0);
+        cpu.set_x(0x03);
+        cpu.set_y(0x04);
+        cpu.set_mem8(0x0000, opcodes[i]);          // Set opcode
+        cpu.set_mem8(0x0001, 0x0F);                // Set first operand
+        cpu.set_mem8(0x0002, 0xFF);                // Set second operand
+        cpu.set_mem8(0x000F, 0x0F);                // Zero paged
+        cpu.set_mem8(0x0001 + cpu.get_x(), 0x0F);  // Zero paged X
+        cpu.set_mem8(0x0001 + cpu.get_y(), 0x0F);  // Zero paged Y
+        cpu.set_mem8(0xFF0F, 0x0F);                // Absolute
+        cpu.set_mem8(0xFF0F + cpu.get_x(), 0x0F);  // Absolute X
+        cpu.set_mem8(0xFF0F + cpu.get_y(), 0x0F);  // Absolute Y
+
+        cpu.exec(opcodes[i]);
+        ASSERT_EQ(cpu.get_a(), EXPECTED);
+        cout << "done.\n";
+     }
+}
