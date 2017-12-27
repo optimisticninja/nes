@@ -42,7 +42,7 @@ TEST(CPU, SEI)
     CPU cpu = CPU();
     cpu.exec(0x78);
     ASSERT_EQ(cpu.get_p() & FLAG_INTERRUPT, FLAG_INTERRUPT);
-    ASSERT_EQ(cpu.get_pc(), 1);
+    ASSERT_EQ(cpu.get_pc(), INSTR_LEN[0x78]);
 }
 
 TEST(CPU, CLD)
@@ -50,10 +50,10 @@ TEST(CPU, CLD)
     CPU cpu = CPU();
     cpu.exec(0xD8);
     ASSERT_EQ(cpu.get_p() & FLAG_DECIMAL, false);
-    ASSERT_EQ(cpu.get_pc(), 1);
+    ASSERT_EQ(cpu.get_pc(), INSTR_LEN[0xD8]);
 }
 
-TEST(CPU, LDA_Immediate)
+TEST(CPU, LDA)
 {
     CPU cpu = CPU();
     // Test negative flag
@@ -62,6 +62,7 @@ TEST(CPU, LDA_Immediate)
     cpu.exec(0xA9);
     ASSERT_EQ(cpu.get_a(), 0xFF);
     ASSERT_EQ(cpu.get_p() & FLAG_NEGATIVE, FLAG_NEGATIVE);
+    ASSERT_EQ(cpu.get_pc(), INSTR_LEN[0xA9]);
     
     // Test zero flag
     cpu = CPU();
@@ -74,7 +75,7 @@ TEST(CPU, LDA_Immediate)
     ASSERT_EQ(cpu.get_p() & FLAG_ZERO, FLAG_ZERO);
 }
 
-TEST(CPU, LDX_IndirectX)
+TEST(CPU, LDX)
 {
     CPU cpu = CPU();
     // Test negative flag
@@ -85,10 +86,12 @@ TEST(CPU, LDX_IndirectX)
     cpu.exec(0xA2);
     ASSERT_EQ(cpu.get_x(), 0xFF);
     ASSERT_EQ(cpu.get_p() & FLAG_NEGATIVE, FLAG_NEGATIVE);
+    ASSERT_EQ(cpu.get_pc(), INSTR_LEN[0xA2]);
 }
 
-TEST(CPU, STA_Absolute)
+TEST(CPU, STA)
 {
+    /* ABSOLUTE */
     CPU cpu = CPU();
     cpu.set_a(0xFF);
     ASSERT_EQ(cpu.get_a(), 0xFF);
@@ -97,5 +100,5 @@ TEST(CPU, STA_Absolute)
     cpu.set_mem8(2, 0xFF);
     cpu.exec(0x8D);
     ASSERT_EQ(cpu.get_mem8(0xFFFF), cpu.get_a());
-    ASSERT_EQ(cpu.get_pc(), 3);
+    ASSERT_EQ(cpu.get_pc(), INSTR_LEN[0x8D]);
 }

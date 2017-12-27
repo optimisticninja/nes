@@ -24,37 +24,52 @@ void CPU::exec(uint8_t opcode)
     MappingMode mode = MAPPING_MODES[opcode];
     
     switch (mode) {
-        case ZERO_X:
-            break;
-        case ZERO_Y:
+        case ABSOLUTE:
+            address = this->get_mem16(this->regs.pc + 1);
             break;
         case ABSOLUTE_X:
+            address = this->get_mem16(this->regs.pc + 1) + this->regs.x;
             break;
         case ABSOLUTE_Y:
+            address = this->get_mem16(this->regs.pc + 1) + this->regs.y;
+            break;
+        case INDIRECT:
+            address = this->get_mem16_bug(this->get_mem16(this->regs.pc + 1));
             break;
         case INDIRECT_X:
+            address = this->get_mem16_bug(this->get_mem16(this->regs.pc + 1 + this->regs.x));
             break;
         case INDIRECT_Y:
+            address = this->get_mem16_bug(this->get_mem16(this->regs.pc + 1)) + this->regs.y;
             break;
         case IMPLICIT:
+            address = 0;
             break;
         case ACCUMULATOR:
+            address = 0;
             break;
         case IMMEDIATE:
             address = this->regs.pc + 1;
             break;
         case ZERO:
-            break;
-        case ABSOLUTE:
             address = this->get_mem16(this->regs.pc + 1);
             break;
-        case RELATIVE:
+        case ZERO_X:
+            address = this->get_mem16(this->regs.pc + 1 + this->regs.x);
             break;
-        case INDIRECT:
+        case ZERO_Y:
+            address = this->get_mem16(this->regs.pc + 1 + this->regs.y);
             break;
-        case NO_MAP:
+        case RELATIVE: {
+            uint16_t offset = this->get_mem8(this->regs.pc + 1);
+            address = (offset < 0x80) 
+                ? this->regs.pc + 2 + offset
+                : this->regs.pc + 2 + offset - 0x100;
             break;
+        }
+        case NO_MAP: /* FALL THROUGH */
         default:
+            cerr << "WARNING: Hit non-standard opcode or data!\n";
             break;
     };
     
@@ -214,6 +229,15 @@ void CPU::set_mem8(size_t i, uint8_t val)
 uint16_t CPU::get_mem16(size_t i)
 {
     return *((uint16_t*) &this->mem[i]);
+}
+
+/* Bug for low byte wrap without incrementing high byte */
+uint16_t CPU::get_mem16_bug(size_t i)
+{
+    uint16_t b = (i & 0xFF00) | (uint16_t) ((uint8_t) i + 1);
+    uint8_t lo = this->get_mem8(i);
+    uint8_t hi = this->get_mem8(b);
+    return (uint16_t) hi << 8 | (uint16_t) lo;
 }
 
 uint8_t* CPU::get_apu_io_regs()
