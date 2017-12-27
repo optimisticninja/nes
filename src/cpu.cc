@@ -80,10 +80,14 @@ void CPU::handle_flags(uint8_t flags, uint8_t val)
     }
     
     if (flags & FLAG_NEGATIVE)
-        (val & 0x80) != 0 ? this->regs->set_flag(FLAG_NEGATIVE) : this->regs->clear_flag(FLAG_NEGATIVE);
+        (val & 0x80) != 0 
+            ? this->regs->set_flag(FLAG_NEGATIVE) 
+            : this->regs->clear_flag(FLAG_NEGATIVE);
     
     if (flags & FLAG_ZERO)
-        val == 0 ? this->regs->set_flag(FLAG_ZERO) : this->regs->clear_flag(FLAG_ZERO);
+        val == 0 
+            ? this->regs->set_flag(FLAG_ZERO) 
+            : this->regs->clear_flag(FLAG_ZERO);
         
     
     if (flags & FLAG_OVERFLOW) {
@@ -139,15 +143,19 @@ void CPU::sei(__attribute__((unused)) InstructionInfo& info)
 
 void CPU::cld(__attribute__((unused)) InstructionInfo& info)
 {
-//     this->regs->pc += 1;
     this->regs->clear_flag(FLAG_DECIMAL);
 }
 
 void CPU::lda(InstructionInfo& info)
 {
-//     this->regs->pc += 1;
     this->regs->a = *this->get_mem8(info.addr);
-    this->handle_flags(FLAG_ZERO | FLAG_DECIMAL, this->regs->a);
+    this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs->a);
+}
+
+void CPU::ldx(InstructionInfo& info)
+{
+    this->regs->x = *this->get_mem8(info.addr);
+    this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs->x);
 }
 
 uint8_t CPU::get_a()
@@ -163,6 +171,11 @@ void CPU::set_a(uint8_t a)
 uint8_t CPU::get_x()
 {
     return this->regs->x;
+}
+
+void CPU::set_x(uint8_t x)
+{
+    this->regs->x = x;
 }
 
 uint8_t CPU::get_y()

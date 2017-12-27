@@ -76,7 +76,7 @@ TEST(CPU, LDA_Immediate)
     cpu.set_mem8(1, 0xFF);
     cpu.exec(0xA9);
     ASSERT_EQ(cpu.get_a(), 0xFF);
-    ASSERT_EQ(cpu.get_p() & FLAG_NEGATIVE, false);
+    ASSERT_EQ(cpu.get_p() & FLAG_NEGATIVE, FLAG_NEGATIVE);
     
     // Test zero flag
     cpu = CPU();
@@ -87,6 +87,19 @@ TEST(CPU, LDA_Immediate)
     cpu.exec(0xA9);
     ASSERT_EQ(cpu.get_a(), 0x00);
     ASSERT_EQ(cpu.get_p() & FLAG_ZERO, FLAG_ZERO);
+}
+
+TEST(CPU, LDX_IndirectX)
+{
+    CPU cpu = CPU();
+    // Test negative flag
+    cpu.set_x(0xEE);
+    ASSERT_EQ(cpu.get_x(), 0xEE);
+    cpu.set_mem8(0, 0xA2);
+    cpu.set_mem8(1, 0xFF);
+    cpu.exec(0xA2);
+    ASSERT_EQ(cpu.get_x(), 0xFF);
+    ASSERT_EQ(cpu.get_p() & FLAG_NEGATIVE, FLAG_NEGATIVE);
 }
 
 TEST(CPU, STA_Absolute)
