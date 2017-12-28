@@ -73,7 +73,6 @@ void CPU::exec(uint8_t opcode)
             break;
     };
     this->regs.pc += INSTR_LEN[opcode];
-    cout << "Addr: " << address << endl;
     this->curr_instr_info.addr = address;
     this->curr_instr_info.mode = mode;
     this->curr_instr_info.opcode = opcode;
@@ -213,6 +212,11 @@ uint16_t CPU::get_pc()
     return this->regs.pc;
 }
 
+void CPU::set_pc(uint16_t pc)
+{
+    this->regs.pc = pc;
+}
+
 uint8_t CPU::get_s()
 {
     return this->regs.s;
@@ -248,10 +252,15 @@ uint16_t CPU::get_mem16(size_t i)
 /* Bug for low byte wrap without incrementing high byte */
 uint16_t CPU::get_mem16_bug(size_t i)
 {
-    uint16_t b = (i & 0xFF00) | (uint16_t) ((uint8_t) i + 1);
+    uint16_t b = (i & 0xFF00) | (i + 1);
     uint8_t lo = this->get_mem8(i);
     uint8_t hi = this->get_mem8(b);
-    return (uint16_t) hi << 8 | (uint16_t) lo;
+    return (uint16_t) hi << 8 | lo;
+}
+
+void CPU::set_mem16(size_t i, uint16_t val)
+{
+    *((uint16_t*) &this->mem[i]) = val;
 }
 
 uint8_t* CPU::get_apu_io_regs()

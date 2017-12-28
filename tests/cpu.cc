@@ -107,28 +107,30 @@ TEST(CPU, STA)
 TEST(CPU, ORA)
 {
     uint8_t opcodes[8] = { 0x09, 0x05, 0x15, 0x0D, 0x1D, 0x19, 0x01, 0x11 };
-    CPU cpu;
-    cpu.set_mem8(0x0001, 0x0F);
+    CPU cpu = CPU();
+    cpu.set_a(0xF0);
+    cpu.set_x(0x03);
+    cpu.set_y(0x04);
+    cpu.set_mem8(0x0001, 0x0F);                // Set first operand
+    cpu.set_mem8(0x0002, 0xFF);                // Set second operand
+    cpu.set_mem8(0x000F, 0x0F);                // Zero paged
+    cpu.set_mem8(0x0001 + cpu.get_x(), 0x0F);  // Zero paged X
+    cpu.set_mem8(0x0001 + cpu.get_y(), 0x0F);  // Zero paged Y
+    cpu.set_mem8(0xFF0F, 0x0F);                // Absolute
+    cpu.set_mem8(0xFF0F + cpu.get_x(), 0x0F);  // Absolute X
+    cpu.set_mem8(0xFF0F + cpu.get_y(), 0x0F);  // Absolute Y
+    cpu.set_mem8(0x0F0F, 0x0F);                // Indirect X
+    cpu.set_mem8(0x0F10, 0x00);                // Indirect X
+    cpu.set_mem8(0x0013, 0x0F);                // Indirect Y
+    cpu.set_mem8(0x0014, 0x00);                // Indirect Y
+    
     const uint8_t EXPECTED = 0xF0 | 0x0F;
         
-     for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
-        cout << hex << unsigned(opcodes[i]) << endl;
-        cpu = CPU();
+    for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
+        cout << "\t\t0x" << hex << uppercase << setfill('0') << setw(2) << unsigned(opcodes[i]) << endl;
+        cpu.set_pc(0x0000);
         cpu.set_a(0xF0);
-        cpu.set_x(0x03);
-        cpu.set_y(0x04);
-        cpu.set_mem8(0x0000, opcodes[i]);          // Set opcode
-        cpu.set_mem8(0x0001, 0x0F);                // Set first operand
-        cpu.set_mem8(0x0002, 0xFF);                // Set second operand
-        cpu.set_mem8(0x000F, 0x0F);                // Zero paged
-        cpu.set_mem8(0x0001 + cpu.get_x(), 0x0F);  // Zero paged X
-        cpu.set_mem8(0x0001 + cpu.get_y(), 0x0F);  // Zero paged Y
-        cpu.set_mem8(0xFF0F, 0x0F);                // Absolute
-        cpu.set_mem8(0xFF0F + cpu.get_x(), 0x0F);  // Absolute X
-        cpu.set_mem8(0xFF0F + cpu.get_y(), 0x0F);  // Absolute Y
-
         cpu.exec(opcodes[i]);
         ASSERT_EQ(cpu.get_a(), EXPECTED);
-        cout << "done.\n";
-     }
+    }
 }

@@ -182,6 +182,7 @@ public:
     uint8_t     get_y();
     void        set_y(uint8_t y);
     uint16_t    get_pc();
+    void        set_pc(uint16_t pc);
     uint8_t     get_s();
     uint8_t     get_p();
     
@@ -190,6 +191,7 @@ public:
     void        set_mem8(size_t i, uint8_t val);
     uint16_t    get_mem16(size_t i);
     uint16_t    get_mem16_bug(size_t i);
+    void        set_mem16(size_t i, uint16_t val);
     
     uint8_t*    get_ram();
     uint8_t*    get_mirror0();
