@@ -205,4 +205,6 @@ public:
     uint8_t*    get_apu_io_regs();
     uint8_t*    get_apu_io_test_mode();
     uint8_t*    get_cartridge_space();
+    
+    InstructionInfo get_curr_instr_info();
 };

@@ -312,3 +312,8 @@ uint8_t* CPU::get_ram()
 {
     return this->ram;
 }
+
+InstructionInfo CPU::get_curr_instr_info()
+{
+    return this->curr_instr_info;
+}

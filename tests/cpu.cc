@@ -4,6 +4,11 @@
 
 #include "../src/cpu.h"
 
+void print_opcode(uint8_t opcode)
+{
+    cout << "\t\t0x" << hex << uppercase << setfill('0') << setw(2) << unsigned(opcode) << endl;
+}
+
 uint16_t get_zero_page_wrapped(uint16_t addr, uint8_t index_reg)
 {
     uint16_t wrapped_addr = addr + index_reg;
@@ -257,19 +262,24 @@ TEST(CPU, LDX)
     ASSERT_EQ(cpu.get_p() & FLAG_NEGATIVE, FLAG_NEGATIVE);
     ASSERT_EQ(cpu.get_pc(), INSTR_LEN[0xA2]);
 }
+*/
 
 TEST(CPU, STA)
 {
+    // TODO: Uncomment when indirect x, y are tested */
+    uint8_t opcodes[] = { 0x85, 0x95, 0x8D, 0x9D, 0x99 /*0x81, 0x91*/ };
     CPU cpu = CPU();
-    cpu.set_a(0xFF);
-    ASSERT_EQ(cpu.get_a(), 0xFF);
-    cpu.set_mem8(0, 0x8D);
-    cpu.set_mem8(1, 0xFF);
-    cpu.set_mem8(2, 0xFF);
-    cpu.exec(0x8D);
-    ASSERT_EQ(cpu.get_mem8(0xFFFF), cpu.get_a());
-    ASSERT_EQ(cpu.get_pc(), INSTR_LEN[0x8D]);
-}*/
+    const uint8_t EXPECTED = 0xFF;
+        
+    for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
+        cout << "\t\t0x" << hex << uppercase << setfill('0') << setw(2) << unsigned(opcodes[i]) << endl;
+        setup_cpu(cpu, MAPPING_MODES[opcodes[i]]);
+        cpu.set_a(EXPECTED);
+        cpu.exec(opcodes[i]);
+        InstructionInfo info = cpu.get_curr_instr_info();
+        ASSERT_EQ(cpu.get_mem8(info.addr), EXPECTED);
+    }
+}
 
 TEST(CPU, ORA)
 {
@@ -279,7 +289,7 @@ TEST(CPU, ORA)
     const uint8_t EXPECTED = 0xF0 | 0x0F;
         
     for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
-        cout << "\t\t0x" << hex << uppercase << setfill('0') << setw(2) << unsigned(opcodes[i]) << endl;
+        print_opcode(opcodes[i]);
         setup_cpu(cpu, MAPPING_MODES[opcodes[i]]);
         cpu.set_a(0xF0);
         cpu.exec(opcodes[i]);
