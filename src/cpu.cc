@@ -241,6 +241,24 @@ void CPU::eor(InstructionInfo& info)
     this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.a);
 }
 
+void CPU::adc(InstructionInfo& info)
+{
+    uint8_t a = this->regs.a;
+    uint8_t b = this->get_mem8(info.addr);
+    uint8_t c = this->get_p() & FLAG_CARRY;
+    
+    this->regs.a = a + b + c;
+    this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.a);
+    
+    (int) (a + b + c) > 0xFF
+        ? this->regs.set_flag(FLAG_CARRY) 
+        : this->regs.clear_flag(FLAG_CARRY);
+    
+    ((a ^ b) & 0x80) == 0 && ((a ^ this->regs.a) & 0x80) != 0 
+        ? this->regs.set_flag(FLAG_OVERFLOW) 
+        : this->regs.clear_flag(FLAG_OVERFLOW);
+}
+
 uint8_t CPU::get_a()
 {
     return this->regs.a;

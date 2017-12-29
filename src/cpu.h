@@ -154,6 +154,7 @@ private:
     void        txa(InstructionInfo& info);
     void        txs(InstructionInfo& info);
     void        tya(InstructionInfo& info);
+    void        adc(InstructionInfo& info);
     
 public:
     CPU();
@@ -167,8 +168,8 @@ public:
                 0, &CPU::_and,         0, 0,         0, &CPU::_and,         0,         0,         0, &CPU::_and,         0, 0,         0, &CPU::_and,         0, 0, // 0x3F
                 0,  &CPU::eor,         0, 0,         0,  &CPU::eor,         0,         0,         0,  &CPU::eor,         0, 0,         0,  &CPU::eor,         0, 0, // 0x4F
                 0,  &CPU::eor,         0, 0,         0,  &CPU::eor,         0,         0,         0,  &CPU::eor,         0, 0,         0,  &CPU::eor,         0, 0, // 0x5F
-                0,          0,         0, 0,         0,          0,         0,         0,         0,          0,         0, 0,         0,          0,         0, 0, // 0x6F
-                0,          0,         0, 0,         0,          0,         0,         0, &CPU::sei,          0,         0, 0,         0,          0,         0, 0, // 0x7F
+                0,  &CPU::adc,         0, 0,         0,  &CPU::adc,         0,         0,         0,  &CPU::adc,         0, 0,         0,  &CPU::adc,         0, 0, // 0x6F
+                0,  &CPU::adc,         0, 0,         0,  &CPU::adc,         0,         0, &CPU::sei,  &CPU::adc,         0, 0,         0,  &CPU::adc,         0, 0, // 0x7F
                 0,  &CPU::sta,         0, 0, &CPU::sty,  &CPU::sta, &CPU::stx,         0,         0,          0, &CPU::txa, 0, &CPU::sty,  &CPU::sta, &CPU::stx, 0, // 0x8F
                 0,  &CPU::sta,         0, 0, &CPU::sty,  &CPU::sta, &CPU::stx,         0, &CPU::tya,  &CPU::sta, &CPU::txs, 0,         0,  &CPU::sta,         0, 0, // 0x9F
         &CPU::ldy,  &CPU::lda, &CPU::ldx, 0, &CPU::ldy,  &CPU::lda, &CPU::ldx,         0, &CPU::tay,  &CPU::lda, &CPU::tax, 0, &CPU::ldy,  &CPU::lda, &CPU::ldx, 0, // 0xAF
