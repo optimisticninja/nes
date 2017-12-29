@@ -146,6 +146,11 @@ private:
     void        stx(InstructionInfo& info);
     void        sty(InstructionInfo& info);
     void        tax(InstructionInfo& info);
+    void        tay(InstructionInfo& info);
+    void        tsx(InstructionInfo& info);
+    void        txa(InstructionInfo& info);
+    void        txs(InstructionInfo& info);
+    void        tya(InstructionInfo& info);
     
 public:
     CPU();
@@ -161,10 +166,10 @@ public:
                 0,         0,         0, 0,         0,         0,         0,         0,         0,         0,         0, 0,         0,         0,         0, 0, // 0x5F
                 0,         0,         0, 0,         0,         0,         0,         0,         0,         0,         0, 0,         0,         0,         0, 0, // 0x6F
                 0,         0,         0, 0,         0,         0,         0,         0, &CPU::sei,         0,         0, 0,         0,         0,         0, 0, // 0x7F
-                0, &CPU::sta,         0, 0, &CPU::sty, &CPU::sta, &CPU::stx,         0,         0,         0,         0, 0, &CPU::sty, &CPU::sta, &CPU::stx, 0, // 0x8F
-                0, &CPU::sta,         0, 0, &CPU::sty, &CPU::sta, &CPU::stx,         0,         0, &CPU::sta,         0, 0,         0, &CPU::sta,         0, 0, // 0x9F
-        &CPU::ldy, &CPU::lda, &CPU::ldx, 0, &CPU::ldy, &CPU::lda, &CPU::ldx,         0,         0, &CPU::lda, &CPU::tax, 0, &CPU::ldy, &CPU::lda, &CPU::ldx, 0, // 0xAF
-                0, &CPU::lda,         0, 0, &CPU::ldy, &CPU::lda, &CPU::ldx,         0,         0, &CPU::lda,         0, 0, &CPU::ldy, &CPU::lda, &CPU::ldx, 0, // 0xBF
+                0, &CPU::sta,         0, 0, &CPU::sty, &CPU::sta, &CPU::stx,         0,         0,         0, &CPU::txa, 0, &CPU::sty, &CPU::sta, &CPU::stx, 0, // 0x8F
+                0, &CPU::sta,         0, 0, &CPU::sty, &CPU::sta, &CPU::stx,         0, &CPU::tya, &CPU::sta, &CPU::txs, 0,         0, &CPU::sta,         0, 0, // 0x9F
+        &CPU::ldy, &CPU::lda, &CPU::ldx, 0, &CPU::ldy, &CPU::lda, &CPU::ldx,         0, &CPU::tay, &CPU::lda, &CPU::tax, 0, &CPU::ldy, &CPU::lda, &CPU::ldx, 0, // 0xAF
+                0, &CPU::lda,         0, 0, &CPU::ldy, &CPU::lda, &CPU::ldx,         0,         0, &CPU::lda, &CPU::tsx, 0, &CPU::ldy, &CPU::lda, &CPU::ldx, 0, // 0xBF
                 0,         0,         0, 0,         0,         0,         0,         0,         0,         0,         0, 0,         0,         0,         0, 0, // 0xCF
                 0,         0,         0, 0,         0,         0,         0,         0, &CPU::cld,         0,         0, 0,         0,         0,         0, 0, // 0xDF
                 0,         0,         0, 0,         0,         0,         0,         0,         0,         0,         0, 0,         0,         0,         0, 0, // 0xEF
@@ -190,6 +195,7 @@ public:
     uint16_t    get_pc();
     void        set_pc(uint16_t pc);
     uint8_t     get_s();
+    void        set_s(uint8_t s);
     uint8_t     get_p();
     
     uint8_t*    get_memptr(size_t i);

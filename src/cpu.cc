@@ -163,6 +163,36 @@ void CPU::tax(__attribute__((unused)) InstructionInfo& info)
     this->regs.x = this->regs.a;
 }
 
+void CPU::tay(__attribute__((unused)) InstructionInfo& info)
+{
+    handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.a);
+    this->regs.y = this->regs.a;
+}
+
+void CPU::tsx(__attribute__((unused)) InstructionInfo& info)
+{
+    handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.s);
+    this->regs.x = this->regs.s;
+}
+
+void CPU::txa(__attribute__((unused)) InstructionInfo& info)
+{
+    handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.x);
+    this->regs.a = this->regs.x;
+}
+
+void CPU::txs(__attribute__((unused)) InstructionInfo& info)
+{
+    handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.x);
+    this->regs.s = this->regs.x;
+}
+
+void CPU::tya(__attribute__((unused)) InstructionInfo& info)
+{
+    handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.y);
+    this->regs.a = this->regs.y;
+}
+
 void CPU::sei(__attribute__((unused)) InstructionInfo& info)
 {
     this->regs.set_flag(FLAG_INTERRUPT);
@@ -240,6 +270,11 @@ void CPU::set_pc(uint16_t pc)
 uint8_t CPU::get_s()
 {
     return this->regs.s;
+}
+
+void CPU::set_s(uint8_t s)
+{
+    this->regs.s = s;
 }
 
 uint8_t CPU::get_p()

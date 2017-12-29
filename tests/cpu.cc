@@ -366,6 +366,51 @@ TEST(CPU, TAX)
     ASSERT_EQ(cpu.get_x(), EXPECTED);
 }
 
+TEST(CPU, TAY)
+{
+    CPU cpu = CPU();
+    const uint8_t EXPECTED = 0xFF;
+    cpu.set_a(EXPECTED);
+    cpu.exec(0xA8);
+    ASSERT_EQ(cpu.get_y(), EXPECTED);
+}
+
+TEST(CPU, TSX)
+{
+    CPU cpu = CPU();
+    const uint8_t EXPECTED = 0xFF;
+    cpu.set_s(EXPECTED);
+    cpu.exec(0xBA);
+    ASSERT_EQ(cpu.get_x(), EXPECTED);
+}
+
+TEST(CPU, TXA)
+{
+    CPU cpu = CPU();
+    const uint8_t EXPECTED = 0xFF;
+    cpu.set_x(EXPECTED);
+    cpu.exec(0x8A);
+    ASSERT_EQ(cpu.get_a(), EXPECTED);
+}
+
+TEST(CPU, TXS)
+{
+    CPU cpu = CPU();
+    const uint8_t EXPECTED = 0xFF;
+    cpu.set_x(EXPECTED);
+    cpu.exec(0x9A);
+    ASSERT_EQ(cpu.get_s(), EXPECTED);
+}
+
+TEST(CPU, TYA)
+{
+    CPU cpu = CPU();
+    const uint8_t EXPECTED = 0xFF;
+    cpu.set_y(EXPECTED);
+    cpu.exec(0x98);
+    ASSERT_EQ(cpu.get_a(), EXPECTED);
+}
+
 TEST(CPU, ORA)
 {
     uint8_t opcodes[] = { 0x09, 0x05, 0x15, 0x0D, 0x1D, 0x19, 0x01, 0x11 };
