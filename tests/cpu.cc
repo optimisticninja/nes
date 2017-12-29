@@ -194,7 +194,6 @@ TEST(AddressingModes, IndirectX)
     uint16_t addr = cpu.get_mem16(wrapped_addr);
     cpu.set_mem16(addr, 0x8000);  // Set zero page wrapped value to target OR operand
     cpu.exec(ORA_INDIRECT_X);
-    cout << cpu.get_curr_instr_info().addr << endl;
     ASSERT_EQ(cpu.get_a(), 0xFF);
 }
 
@@ -280,8 +279,6 @@ TEST(CPU, LDA)
         cpu.exec(opcodes[i]);
         ASSERT_EQ(cpu.get_a(), EXPECTED);
     }
-    
-    /* TODO: Test flags */
 }
 
 TEST(CPU, LDX)
@@ -296,8 +293,20 @@ TEST(CPU, LDX)
         cpu.exec(opcodes[i]);
         ASSERT_EQ(cpu.get_x(), EXPECTED);
     }
-    
-    /* TODO: Test flags */
+}
+
+TEST(CPU, LDY)
+{
+    uint8_t opcodes[] = { 0xA0, 0xA4, 0xB4, 0xAC, 0xBC };
+    CPU cpu = CPU();
+    const uint8_t EXPECTED = 0xFF;
+        
+    for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
+        print_opcode(opcodes[i]);
+        setup_cpu(cpu, MAPPING_MODES[opcodes[i]], true);
+        cpu.exec(opcodes[i]);
+        ASSERT_EQ(cpu.get_y(), EXPECTED);
+    }
 }
 
 TEST(CPU, STA)
@@ -334,7 +343,6 @@ TEST(CPU, STX)
 
 TEST(CPU, ORA)
 {
-    // TODO: Uncomment when indirect x, y are tested */
     uint8_t opcodes[] = { 0x09, 0x05, 0x15, 0x0D, 0x1D, 0x19, 0x01, 0x11 };
     CPU cpu = CPU();
     const uint8_t EXPECTED = 0xF0 | 0x0F;

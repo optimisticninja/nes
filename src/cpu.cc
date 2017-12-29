@@ -133,11 +133,8 @@ uint16_t CPU::pull16()
     return hi << 8 | lo;
 }
 
-
-
 void CPU::brk(InstructionInfo& info)
 {
-//     this->regs.pc += 2;
     this->push16(this->regs.pc);
     this->push8(this->regs.p);
     this->sei(info);
@@ -175,6 +172,12 @@ void CPU::ldx(InstructionInfo& info)
 {
     this->regs.x = this->get_mem8(info.addr);
     this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.x);
+}
+
+void CPU::ldy(InstructionInfo& info)
+{
+    this->regs.y = this->get_mem8(info.addr);
+    this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.y);
 }
 
 void CPU::ora(InstructionInfo& info)
