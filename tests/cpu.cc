@@ -288,6 +288,23 @@ TEST(CPU, STA)
     }
 }
 
+TEST(CPU, STX)
+{
+    // TODO: Uncomment when indirect x, y are tested */
+    uint8_t opcodes[] = { 0x86, 0x96, 0x8E };
+    CPU cpu = CPU();
+    const uint8_t EXPECTED = 0xFF;
+        
+    for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
+        print_opcode(opcodes[i]);
+        setup_cpu(cpu, MAPPING_MODES[opcodes[i]], false);
+        cpu.set_x(EXPECTED);
+        cpu.exec(opcodes[i]);
+        InstructionInfo info = cpu.get_curr_instr_info();
+        ASSERT_EQ(cpu.get_mem8(info.addr), EXPECTED);
+    }
+}
+
 TEST(CPU, ORA)
 {
     // TODO: Uncomment when indirect x, y are tested */
