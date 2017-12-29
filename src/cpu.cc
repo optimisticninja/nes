@@ -4,8 +4,6 @@
     #include <iostream>
 #endif
 
-static const uint8_t FLAGS_IRQ_DISABLED = 0x34;
-
 CPU::CPU()
 {
     regs.p = FLAGS_IRQ_DISABLED;
@@ -52,13 +50,15 @@ void CPU::exec(uint8_t opcode)
             address = this->regs.pc + 1;
             break;
         case ZERO:
-            address = (uint16_t) this->get_mem8(this->regs.pc + 1);
+            address = this->get_mem8(this->regs.pc + 1);
             break;
         case ZERO_X:
-            address = (uint16_t) this->get_mem8(this->regs.pc + 1 + this->regs.x);
+            address = this->get_mem8(this->regs.pc + 1) + this->regs.x;
+            address -= address & 0xFF00;    // Ignore carry and wrap on zero page
             break;
         case ZERO_Y:
-            address = (uint16_t) this->get_mem8(this->regs.pc + 1 + this->regs.y);
+            address = this->get_mem8(this->regs.pc + 1) + this->regs.y;
+            address -= address & 0xFF00;    // Ignore carry and wrap on zero page
             break;
         case RELATIVE: {
             uint16_t offset = this->get_mem8(this->regs.pc + 1);
@@ -147,6 +147,11 @@ void CPU::brk(InstructionInfo& info)
 void CPU::sta(InstructionInfo& info)
 {
     this->set_mem8(info.addr, this->regs.a);
+}
+
+void CPU::stx(InstructionInfo& info)
+{
+    this->set_mem8(info.addr, this->regs.x);
 }
 
 void CPU::sei(__attribute__((unused)) InstructionInfo& info)
