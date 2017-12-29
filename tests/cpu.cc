@@ -16,29 +16,37 @@ uint16_t get_zero_page_wrapped(uint16_t addr, uint8_t index_reg)
     return wrapped_addr;
 }
 
-void setup_cpu(CPU& cpu, MappingMode mode)
+const uint16_t TARGET_ADDRESS = 0xFF0F;
+
+void setup_cpu(CPU& cpu, MappingMode mode, bool load)
 {
     cpu.set_pc(0x0000);
     cpu.set_x(0x03);
     cpu.set_y(0x04);
     cpu.set_mem8(0x0001, 0x0F); // Set first operand
 
+    uint16_t address = 0x0000;
+    
     switch (mode) {
         case ABSOLUTE:
+            address = TARGET_ADDRESS;
             cpu.set_mem8(0x0002, 0xFF);                // Set second operand
-            cpu.set_mem8(0xFF0F, 0x0F);                // Set target address value
+            cpu.set_mem8(TARGET_ADDRESS, 0x0F);                // Set target address value
             break;
         case ABSOLUTE_X:
+            address = TARGET_ADDRESS + cpu.get_x();
             cpu.set_mem8(0x0002, 0xFF);                // Set second operand
-            cpu.set_mem8(0xFF0F + cpu.get_x(), 0x0F);  // Set target address value
+            cpu.set_mem8(address, 0x0F);  // Set target address value
             break;
         case ABSOLUTE_Y:
+            address = TARGET_ADDRESS + cpu.get_y();
             cpu.set_mem8(0x0002, 0xFF);                // Set second operand
-            cpu.set_mem8(0xFF0F + cpu.get_y(), 0x0F);  // Set target address value
+            cpu.set_mem8(address, 0x0F);  // Set target address value
             break;
         case ACCUMULATOR:
             break;
         case IMMEDIATE:
+            address = 0x0001;
             break;
         case IMPLICIT:
             break;
@@ -55,21 +63,26 @@ void setup_cpu(CPU& cpu, MappingMode mode)
 //         case RELATIVE:
 //             break;
         case ZERO:
-            cpu.set_mem8(0x000F, 0x0F);                // Set target address value
+            address = TARGET_ADDRESS - (TARGET_ADDRESS & 0xFF00);
+            cpu.set_mem8(address, 0x0F);                // Set target address value
             break;
         case ZERO_X: {
-            uint16_t address = get_zero_page_wrapped(0x000F, cpu.get_x());
+            address = get_zero_page_wrapped(TARGET_ADDRESS - (TARGET_ADDRESS & 0xFF00), cpu.get_x());
             cpu.set_mem8(address, 0x0F);               // Set target address value
             break;
         }
         case ZERO_Y: {
-            uint16_t address = get_zero_page_wrapped(0x000F, cpu.get_y());
+            address = get_zero_page_wrapped(TARGET_ADDRESS - (TARGET_ADDRESS & 0xFF00), cpu.get_y());
             cpu.set_mem8(address, 0x0F);               // Set target address value
             break;
         }
         case NO_MAP:
         default:
             break;
+    }
+    
+    if (load) {
+        cpu.set_mem8(address, 0xFF);
     }
 }
 
@@ -248,21 +261,33 @@ TEST(CPU, LDA)
     ASSERT_EQ(cpu.get_a(), 0x00);
     ASSERT_EQ(cpu.get_p() & FLAG_ZERO, FLAG_ZERO);
 }
+*/
 
 TEST(CPU, LDX)
 {
+    uint8_t opcodes[] = { 0xA2, 0xA6, 0xB6, 0xAE, 0xBE };
     CPU cpu = CPU();
-    // Test negative flag
-    cpu.set_x(0xEE);
-    ASSERT_EQ(cpu.get_x(), 0xEE);
-    cpu.set_mem8(0, 0xA2);
-    cpu.set_mem8(1, 0xFF);
-    cpu.exec(0xA2);
-    ASSERT_EQ(cpu.get_x(), 0xFF);
-    ASSERT_EQ(cpu.get_p() & FLAG_NEGATIVE, FLAG_NEGATIVE);
-    ASSERT_EQ(cpu.get_pc(), INSTR_LEN[0xA2]);
+    const uint8_t EXPECTED = 0xFF;
+        
+    for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
+        print_opcode(opcodes[i]);
+        setup_cpu(cpu, MAPPING_MODES[opcodes[i]], true);
+        //cpu.set_a(EXPECTED);
+        cpu.exec(opcodes[i]);
+        ASSERT_EQ(cpu.get_x(), EXPECTED);
+    }
+    
+//     CPU cpu = CPU();
+//     // Test negative flag
+//     cpu.set_x(0xEE);
+//     ASSERT_EQ(cpu.get_x(), 0xEE);
+//     cpu.set_mem8(0, 0xA2);
+//     cpu.set_mem8(1, 0xFF);
+//     cpu.exec(0xA2);
+//     ASSERT_EQ(cpu.get_x(), 0xFF);
+//     ASSERT_EQ(cpu.get_p() & FLAG_NEGATIVE, FLAG_NEGATIVE);
+//     ASSERT_EQ(cpu.get_pc(), INSTR_LEN[0xA2]);
 }
-*/
 
 TEST(CPU, STA)
 {
@@ -273,7 +298,7 @@ TEST(CPU, STA)
         
     for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
         cout << "\t\t0x" << hex << uppercase << setfill('0') << setw(2) << unsigned(opcodes[i]) << endl;
-        setup_cpu(cpu, MAPPING_MODES[opcodes[i]]);
+        setup_cpu(cpu, MAPPING_MODES[opcodes[i]], false);
         cpu.set_a(EXPECTED);
         cpu.exec(opcodes[i]);
         InstructionInfo info = cpu.get_curr_instr_info();
@@ -290,7 +315,7 @@ TEST(CPU, ORA)
         
     for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
         print_opcode(opcodes[i]);
-        setup_cpu(cpu, MAPPING_MODES[opcodes[i]]);
+        setup_cpu(cpu, MAPPING_MODES[opcodes[i]], false);
         cpu.set_a(0xF0);
         cpu.exec(opcodes[i]);
         ASSERT_EQ(cpu.get_a(), EXPECTED);
