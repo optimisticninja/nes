@@ -239,29 +239,24 @@ TEST(CPU, CLD)
     ASSERT_EQ(cpu.get_p() & FLAG_DECIMAL, false);
     ASSERT_EQ(cpu.get_pc(), INSTR_LEN[0xD8]);
 }
-/*
+
 TEST(CPU, LDA)
 {
+    /* TODO: Uncomment opcodes when indirect x, y done */
+    uint8_t opcodes[] = { 0xA9, 0xA5, 0xB5, 0xAD, 0xBD, 0xB9 /*0xA1, 0xB1*/ };
     CPU cpu = CPU();
-    // Test negative flag
-    cpu.set_mem8(0, 0xA9);
-    cpu.set_mem8(1, 0xFF);
-    cpu.exec(0xA9);
-    ASSERT_EQ(cpu.get_a(), 0xFF);
-    ASSERT_EQ(cpu.get_p() & FLAG_NEGATIVE, FLAG_NEGATIVE);
-    ASSERT_EQ(cpu.get_pc(), INSTR_LEN[0xA9]);
+    const uint8_t EXPECTED = 0xFF;
+        
+    for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
+        print_opcode(opcodes[i]);
+        setup_cpu(cpu, MAPPING_MODES[opcodes[i]], true);
+        //cpu.set_a(EXPECTED);
+        cpu.exec(opcodes[i]);
+        ASSERT_EQ(cpu.get_a(), EXPECTED);
+    }
     
-    // Test zero flag
-    cpu = CPU();
-    cpu.set_a(0xFF);
-    cpu.set_mem8(1, 0xFF);
-    cpu.set_mem8(0, 0xA9);
-    cpu.set_mem8(1, 0x00);
-    cpu.exec(0xA9);
-    ASSERT_EQ(cpu.get_a(), 0x00);
-    ASSERT_EQ(cpu.get_p() & FLAG_ZERO, FLAG_ZERO);
+    /* TODO: Test flags */
 }
-*/
 
 TEST(CPU, LDX)
 {
@@ -277,16 +272,7 @@ TEST(CPU, LDX)
         ASSERT_EQ(cpu.get_x(), EXPECTED);
     }
     
-//     CPU cpu = CPU();
-//     // Test negative flag
-//     cpu.set_x(0xEE);
-//     ASSERT_EQ(cpu.get_x(), 0xEE);
-//     cpu.set_mem8(0, 0xA2);
-//     cpu.set_mem8(1, 0xFF);
-//     cpu.exec(0xA2);
-//     ASSERT_EQ(cpu.get_x(), 0xFF);
-//     ASSERT_EQ(cpu.get_p() & FLAG_NEGATIVE, FLAG_NEGATIVE);
-//     ASSERT_EQ(cpu.get_pc(), INSTR_LEN[0xA2]);
+    /* TODO: Test flags */
 }
 
 TEST(CPU, STA)
