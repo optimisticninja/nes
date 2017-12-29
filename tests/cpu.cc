@@ -229,7 +229,6 @@ TEST(CPU, SEI)
     CPU cpu = CPU();
     cpu.exec(0x78);
     ASSERT_EQ(cpu.get_p() & FLAG_INTERRUPT, FLAG_INTERRUPT);
-    ASSERT_EQ(cpu.get_pc(), INSTR_LEN[0x78]);
 }
 
 TEST(CPU, CLD)
@@ -237,7 +236,6 @@ TEST(CPU, CLD)
     CPU cpu = CPU();
     cpu.exec(0xD8);
     ASSERT_EQ(cpu.get_p() & FLAG_DECIMAL, false);
-    ASSERT_EQ(cpu.get_pc(), INSTR_LEN[0xD8]);
 }
 
 TEST(CPU, LDA)
@@ -250,7 +248,6 @@ TEST(CPU, LDA)
     for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
         print_opcode(opcodes[i]);
         setup_cpu(cpu, MAPPING_MODES[opcodes[i]], true);
-        //cpu.set_a(EXPECTED);
         cpu.exec(opcodes[i]);
         ASSERT_EQ(cpu.get_a(), EXPECTED);
     }
@@ -267,7 +264,6 @@ TEST(CPU, LDX)
     for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
         print_opcode(opcodes[i]);
         setup_cpu(cpu, MAPPING_MODES[opcodes[i]], true);
-        //cpu.set_a(EXPECTED);
         cpu.exec(opcodes[i]);
         ASSERT_EQ(cpu.get_x(), EXPECTED);
     }
@@ -283,7 +279,7 @@ TEST(CPU, STA)
     const uint8_t EXPECTED = 0xFF;
         
     for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
-        cout << "\t\t0x" << hex << uppercase << setfill('0') << setw(2) << unsigned(opcodes[i]) << endl;
+        print_opcode(opcodes[i]);
         setup_cpu(cpu, MAPPING_MODES[opcodes[i]], false);
         cpu.set_a(EXPECTED);
         cpu.exec(opcodes[i]);
