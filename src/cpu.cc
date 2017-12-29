@@ -32,13 +32,14 @@ void CPU::exec(uint8_t opcode)
             address = this->get_mem16(this->regs.pc + 1) + this->regs.y;
             break;
         case INDIRECT:
-            address = this->get_mem16_bug(this->get_mem16(this->regs.pc + 1));
+            //address = this->get_mem16_bug(this->get_mem16(this->regs.pc + 1));
             break;
         case INDIRECT_X:
-            address = this->get_mem16_bug(this->get_mem16(this->regs.pc + 1 + this->regs.x));
+            address = this->get_mem8(this->regs.pc + 1) + this->regs.x;
+            address -= address & 0xFF00;    // Ignore carry and wrap on zero page
             break;
         case INDIRECT_Y:
-            address = this->get_mem16_bug(this->get_mem16(this->regs.pc + 1)) + this->regs.y;
+            address = this->get_mem16(this->get_mem8(this->regs.pc + 1)) + this->regs.y;
             break;
         case IMPLICIT:
             address = 0;
@@ -252,15 +253,6 @@ uint16_t CPU::get_mem16(size_t i)
     uint16_t lo = this->get_mem8(i);
     uint16_t hi = this->get_mem8(i + 1);
     return hi << 8 | lo;
-}
-
-/* Bug for low byte wrap without incrementing high byte */
-uint16_t CPU::get_mem16_bug(size_t i)
-{
-    uint16_t b = (i & 0xFF00) | (i + 1);
-    uint8_t lo = this->get_mem8(i);
-    uint8_t hi = this->get_mem8(b);
-    return (uint16_t) hi << 8 | lo;
 }
 
 void CPU::set_mem16(size_t i, uint16_t val)

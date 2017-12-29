@@ -52,16 +52,16 @@ void setup_cpu(CPU& cpu, MappingMode mode, bool load)
             break;
         case INDIRECT:
             break;
-//         case INDIRECT_X:
-//             cpu.set_mem8(0x0F0F, 0x0F);                // Indirect X
-//             cpu.set_mem8(0x0F10, 0x00);                // Indirect X
-//             break;
-//         case INDIRECT_Y:
-//             cpu.set_mem8(0x0013, 0x0F);                // Indirect Y
-//             cpu.set_mem8(0x0014, 0x00);                // Indirect Y
-//             break;
-//         case RELATIVE:
-//             break;
+        case INDIRECT_X:
+            address = cpu.get_mem16(get_zero_page_wrapped(cpu.get_mem8(0x0001), cpu.get_x()));
+            cpu.set_mem8(address, 0x0F);
+            break;
+        case INDIRECT_Y:
+            address = cpu.get_mem16(cpu.get_mem8(0x0001)) + cpu.get_y();
+            cpu.set_mem8(address, 0x0F);
+            break;
+        case RELATIVE:
+            break;
         case ZERO:
             address = TARGET_ADDRESS - (TARGET_ADDRESS & 0xFF00);
             cpu.set_mem8(address, 0x0F);                // Set target address value
@@ -97,8 +97,8 @@ TEST(CPU, PowerOnState)
     ASSERT_EQ(cpu.get_pc(), 0x0000);
 }
 
-/**************************************************************************************************************|| 
- * Using ORA instruction to test.
+/****************************************************************************************************************|| 
+ * Using ORA instruction to test Zero, ZeroX, Absolute, AbsoluteX, AbxoluteY and Immediate, IndirectX, IndirectY
  *      - ORs the accumulator with the value in the address stored in the two bytes after the opcode
  *      - The expected value in accumulator should equate to 0xFF (0x0F | 0xF0)
  */
@@ -110,6 +110,8 @@ const uint8_t   ORA_ABSOLUTE_Y      = 0x19;
 const uint8_t   ORA_IMMEDIATE       = 0x09;
 const uint8_t   ORA_ZERO            = 0x05;
 const uint8_t   ORA_ZERO_X          = 0x15;
+const uint8_t   ORA_INDIRECT_X      = 0x01;
+const uint8_t   ORA_INDIRECT_Y      = 0x11;
 
 TEST(AddressingModes, Zero)
 {
@@ -181,10 +183,38 @@ TEST(AddressingModes, Immediate)
     ASSERT_EQ(cpu.get_a(), 0xFF);
 }
 
+TEST(AddressingModes, IndirectX)
+{
+    CPU cpu = CPU();
+    cpu.set_a(0xF0);
+    cpu.set_x(0x00);
+    cpu.set_mem8(0x0000, ORA_INDIRECT_X); // Set opcode
+    cpu.set_mem8(0x0001, 0x02);           // Set next byte as zero page address
+    uint16_t wrapped_addr = get_zero_page_wrapped(0x0002, cpu.get_x());
+    uint16_t addr = cpu.get_mem16(wrapped_addr);
+    cpu.set_mem16(addr, 0x8000);  // Set zero page wrapped value to target OR operand
+    cpu.exec(ORA_INDIRECT_X);
+    cout << cpu.get_curr_instr_info().addr << endl;
+    ASSERT_EQ(cpu.get_a(), 0xFF);
+}
+
+TEST(AddressingModes, IndirectY)
+{
+    CPU cpu = CPU();
+    cpu.set_a(0xF0);
+    cpu.set_y(0x04);
+    cpu.set_mem8(0x0000, ORA_INDIRECT_Y); // Set opcode
+    cpu.set_mem8(0x0001, 0x02);           // Set next byte as zero page address
+    cpu.set_mem16(0x0002, 0x8000);        // Set zero page area address
+    cpu.set_mem8(0x8004, 0x0F);
+    cpu.exec(ORA_INDIRECT_Y);
+    ASSERT_EQ(cpu.get_a(), 0xFF);
+}
+
 /***************************************************************************************************************/
 
 /***************************************************************************************************************
- * Using STX instruction to test Zero Page Y.                                                                  */
+ * Using STX instruction to test ZeroY.                                                                  */
 
 const uint8_t STX_ZERO_Y = 0x96;
 
@@ -240,8 +270,7 @@ TEST(CPU, CLD)
 
 TEST(CPU, LDA)
 {
-    /* TODO: Uncomment opcodes when indirect x, y done */
-    uint8_t opcodes[] = { 0xA9, 0xA5, 0xB5, 0xAD, 0xBD, 0xB9 /*0xA1, 0xB1*/ };
+    uint8_t opcodes[] = { 0xA9, 0xA5, 0xB5, 0xAD, 0xBD, 0xB9, 0xA1, 0xB1 };
     CPU cpu = CPU();
     const uint8_t EXPECTED = 0xFF;
         
@@ -273,8 +302,7 @@ TEST(CPU, LDX)
 
 TEST(CPU, STA)
 {
-    // TODO: Uncomment when indirect x, y are tested */
-    uint8_t opcodes[] = { 0x85, 0x95, 0x8D, 0x9D, 0x99 /*0x81, 0x91*/ };
+    uint8_t opcodes[] = { 0x85, 0x95, 0x8D, 0x9D, 0x99, 0x81, 0x91 };
     CPU cpu = CPU();
     const uint8_t EXPECTED = 0xFF;
         
@@ -307,7 +335,7 @@ TEST(CPU, STX)
 TEST(CPU, ORA)
 {
     // TODO: Uncomment when indirect x, y are tested */
-    uint8_t opcodes[] = { 0x09, 0x05, 0x15, 0x0D, 0x1D, 0x19 /*0x01, 0x11*/ };
+    uint8_t opcodes[] = { 0x09, 0x05, 0x15, 0x0D, 0x1D, 0x19, 0x01, 0x11 };
     CPU cpu = CPU();
     const uint8_t EXPECTED = 0xF0 | 0x0F;
         
