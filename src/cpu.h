@@ -144,6 +144,7 @@ private:
     void        sei(InstructionInfo& info);
     void        sta(InstructionInfo& info);
     void        stx(InstructionInfo& info);
+    void        sty(InstructionInfo& info);
     
 public:
     CPU();
@@ -159,8 +160,8 @@ public:
                 0,         0,         0, 0,         0,         0,         0,         0,         0,         0, 0, 0,         0,         0,         0, 0, // 0x5F
                 0,         0,         0, 0,         0,         0,         0,         0,         0,         0, 0, 0,         0,         0,         0, 0, // 0x6F
                 0,         0,         0, 0,         0,         0,         0,         0, &CPU::sei,         0, 0, 0,         0,         0,         0, 0, // 0x7F
-                0, &CPU::sta,         0, 0,         0, &CPU::sta, &CPU::stx,         0,         0,         0, 0, 0,         0, &CPU::sta, &CPU::stx, 0, // 0x8F
-                0, &CPU::sta,         0, 0,         0, &CPU::sta, &CPU::stx,         0,         0, &CPU::sta, 0, 0,         0, &CPU::sta,         0, 0, // 0x9F
+                0, &CPU::sta,         0, 0, &CPU::sty, &CPU::sta, &CPU::stx,         0,         0,         0, 0, 0, &CPU::sty, &CPU::sta, &CPU::stx, 0, // 0x8F
+                0, &CPU::sta,         0, 0, &CPU::sty, &CPU::sta, &CPU::stx,         0,         0, &CPU::sta, 0, 0,         0, &CPU::sta,         0, 0, // 0x9F
         &CPU::ldy, &CPU::lda, &CPU::ldx, 0, &CPU::ldy, &CPU::lda, &CPU::ldx,         0,         0, &CPU::lda, 0, 0, &CPU::ldy, &CPU::lda, &CPU::ldx, 0, // 0xAF
                 0, &CPU::lda,         0, 0, &CPU::ldy, &CPU::lda, &CPU::ldx,         0,         0, &CPU::lda, 0, 0, &CPU::ldy, &CPU::lda, &CPU::ldx, 0, // 0xBF
                 0,         0,         0, 0,         0,         0,         0,         0,         0,         0, 0, 0,         0,         0,         0, 0, // 0xCF

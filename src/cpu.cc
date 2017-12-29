@@ -152,6 +152,11 @@ void CPU::stx(InstructionInfo& info)
     this->set_mem8(info.addr, this->regs.x);
 }
 
+void CPU::sty(InstructionInfo& info)
+{
+    this->set_mem8(info.addr, this->regs.y);
+}
+
 void CPU::sei(__attribute__((unused)) InstructionInfo& info)
 {
     this->regs.set_flag(FLAG_INTERRUPT);
