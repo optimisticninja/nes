@@ -136,6 +136,7 @@ private:
     InstructionInfo curr_instr_info;
     
     void        cld(InstructionInfo& info);
+    void        nop(InstructionInfo& info);
     void        brk(InstructionInfo& info);
     void        lda(InstructionInfo& info);
     void        ldx(InstructionInfo& info);
@@ -174,7 +175,7 @@ public:
                 0,  &CPU::lda,         0, 0, &CPU::ldy,  &CPU::lda, &CPU::ldx,         0,         0,  &CPU::lda, &CPU::tsx, 0, &CPU::ldy,  &CPU::lda, &CPU::ldx, 0, // 0xBF
                 0,          0,         0, 0,         0,          0,         0,         0,         0,          0,         0, 0,         0,          0,         0, 0, // 0xCF
                 0,          0,         0, 0,         0,          0,         0,         0, &CPU::cld,          0,         0, 0,         0,          0,         0, 0, // 0xDF
-                0,          0,         0, 0,         0,          0,         0,         0,         0,          0,         0, 0,         0,          0,         0, 0, // 0xEF
+                0,          0,         0, 0,         0,          0,         0,         0,         0,          0, &CPU::nop, 0,         0,          0,         0, 0, // 0xEF
                 0,          0,         0, 0,         0,          0,         0,         0,         0,          0,         0, 0,         0,          0,         0, 0  // 0xFF
     };
 

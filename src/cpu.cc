@@ -139,6 +139,11 @@ void CPU::brk(InstructionInfo& info)
     this->regs.pc = this->get_mem16(0xFFFE);
 }
 
+void CPU::nop(__attribute__((unused)) InstructionInfo& info)
+{
+    /* NOPping... */
+}
+
 void CPU::sta(InstructionInfo& info)
 {
     this->set_mem8(info.addr, this->regs.a);
