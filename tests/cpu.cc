@@ -290,7 +290,6 @@ TEST(CPU, STA)
 
 TEST(CPU, STX)
 {
-    // TODO: Uncomment when indirect x, y are tested */
     uint8_t opcodes[] = { 0x86, 0x96, 0x8E };
     CPU cpu = CPU();
     const uint8_t EXPECTED = 0xFF;
