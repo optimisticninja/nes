@@ -35,8 +35,7 @@ void CPU::exec(uint8_t opcode)
             //address = this->get_mem16_bug(this->get_mem16(this->regs.pc + 1));
             break;
         case INDIRECT_X:
-            address = this->get_mem8(this->regs.pc + 1) + this->regs.x;
-            address -= address & 0xFF00;    // Ignore carry and wrap on zero page
+            address = (this->get_mem8(this->regs.pc + 1) + this->regs.x) & 0x00FF; // Ignore carry and wrap on zero page 
             break;
         case INDIRECT_Y:
             address = this->get_mem16(this->get_mem8(this->regs.pc + 1)) + this->regs.y;
@@ -54,12 +53,10 @@ void CPU::exec(uint8_t opcode)
             address = this->get_mem8(this->regs.pc + 1);
             break;
         case ZERO_X:
-            address = this->get_mem8(this->regs.pc + 1) + this->regs.x;
-            address -= address & 0xFF00;    // Ignore carry and wrap on zero page
+            address = (this->get_mem8(this->regs.pc + 1) + this->regs.x)  & 0x00FF; // Ignore carry and wrap on zero page
             break;
         case ZERO_Y:
-            address = this->get_mem8(this->regs.pc + 1) + this->regs.y;
-            address -= address & 0xFF00;    // Ignore carry and wrap on zero page
+            address = (this->get_mem8(this->regs.pc + 1) + this->regs.y)  & 0x00FF; // Ignore carry and wrap on zero page;
             break;
         case RELATIVE: {
             uint16_t offset = this->get_mem8(this->regs.pc + 1);
@@ -230,7 +227,7 @@ void CPU::ora(InstructionInfo& info)
 void CPU::_and(InstructionInfo& info)
 {
     this->regs.a &= this->get_mem8(info.addr);
-    this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.a);
+    this->handle_flags(FLAG_ZERO  | FLAG_NEGATIVE, this->regs.a);
 }
 
 void CPU::eor(InstructionInfo& info)

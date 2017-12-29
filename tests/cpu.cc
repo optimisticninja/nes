@@ -11,8 +11,7 @@ void print_opcode(uint8_t opcode)
 
 uint16_t get_zero_page_wrapped(uint16_t addr, uint8_t index_reg)
 {
-    uint16_t wrapped_addr = addr + index_reg;
-    wrapped_addr -= wrapped_addr & 0xFF00;
+    uint16_t wrapped_addr = (addr + index_reg) & 0x00FF;
     return wrapped_addr;
 }
 
@@ -63,16 +62,16 @@ void setup_cpu(CPU& cpu, MappingMode mode, bool load)
         case RELATIVE:
             break;
         case ZERO:
-            address = TARGET_ADDRESS - (TARGET_ADDRESS & 0xFF00);
+            address = TARGET_ADDRESS & 0x00FF;
             cpu.set_mem8(address, 0x0F);                // Set target address value
             break;
         case ZERO_X: {
-            address = get_zero_page_wrapped(TARGET_ADDRESS - (TARGET_ADDRESS & 0xFF00), cpu.get_x());
+            address = get_zero_page_wrapped(TARGET_ADDRESS & 0x00FF, cpu.get_x());
             cpu.set_mem8(address, 0x0F);               // Set target address value
             break;
         }
         case ZERO_Y: {
-            address = get_zero_page_wrapped(TARGET_ADDRESS - (TARGET_ADDRESS & 0xFF00), cpu.get_y());
+            address = get_zero_page_wrapped(TARGET_ADDRESS & 0x00FF, cpu.get_y());
             cpu.set_mem8(address, 0x0F);               // Set target address value
             break;
         }
