@@ -227,6 +227,12 @@ void CPU::ora(InstructionInfo& info)
     this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.a);
 }
 
+void CPU::_and(InstructionInfo& info)
+{
+    this->regs.a &= this->get_mem8(info.addr);
+    this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.a);
+}
+
 uint8_t CPU::get_a()
 {
     return this->regs.a;

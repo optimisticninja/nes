@@ -425,3 +425,18 @@ TEST(CPU, ORA)
         ASSERT_EQ(cpu.get_a(), EXPECTED);
     }
 }
+
+TEST(CPU, AND)
+{
+    uint8_t opcodes[] = { 0x29, 0x25, 0x35, 0x2D, 0x3D, 0x39, 0x21, 0x31 };
+    CPU cpu = CPU();
+    const uint8_t EXPECTED = 0x0F & 0x0F;
+        
+    for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
+        print_opcode(opcodes[i]);
+        setup_cpu(cpu, MAPPING_MODES[opcodes[i]], false);
+        cpu.set_a(0x0F);
+        cpu.exec(opcodes[i]);
+        ASSERT_EQ(cpu.get_a(), EXPECTED);
+    }
+}
