@@ -142,6 +142,7 @@ private:
     void        ldy(InstructionInfo& info);
     void        ora(InstructionInfo& info);
     void        _and(InstructionInfo& info);
+    void        eor(InstructionInfo& info);
     void        sei(InstructionInfo& info);
     void        sta(InstructionInfo& info);
     void        stx(InstructionInfo& info);
@@ -163,8 +164,8 @@ public:
                 0,  &CPU::ora,         0, 0,         0,  &CPU::ora,         0,         0,         0,  &CPU::ora,         0, 0,         0,  &CPU::ora,         0, 0, // 0x1F
                 0, &CPU::_and,         0, 0,         0, &CPU::_and,         0,         0,         0, &CPU::_and,         0, 0,         0, &CPU::_and,         0, 0, // 0x2F
                 0, &CPU::_and,         0, 0,         0, &CPU::_and,         0,         0,         0, &CPU::_and,         0, 0,         0, &CPU::_and,         0, 0, // 0x3F
-                0,          0,         0, 0,         0,          0,         0,         0,         0,          0,         0, 0,         0,          0,         0, 0, // 0x4F
-                0,          0,         0, 0,         0,          0,         0,         0,         0,          0,         0, 0,         0,          0,         0, 0, // 0x5F
+                0,  &CPU::eor,         0, 0,         0,  &CPU::eor,         0,         0,         0,  &CPU::eor,         0, 0,         0,  &CPU::eor,         0, 0, // 0x4F
+                0,  &CPU::eor,         0, 0,         0,  &CPU::eor,         0,         0,         0,  &CPU::eor,         0, 0,         0,  &CPU::eor,         0, 0, // 0x5F
                 0,          0,         0, 0,         0,          0,         0,         0,         0,          0,         0, 0,         0,          0,         0, 0, // 0x6F
                 0,          0,         0, 0,         0,          0,         0,         0, &CPU::sei,          0,         0, 0,         0,          0,         0, 0, // 0x7F
                 0,  &CPU::sta,         0, 0, &CPU::sty,  &CPU::sta, &CPU::stx,         0,         0,          0, &CPU::txa, 0, &CPU::sty,  &CPU::sta, &CPU::stx, 0, // 0x8F

@@ -440,3 +440,18 @@ TEST(CPU, AND)
         ASSERT_EQ(cpu.get_a(), EXPECTED);
     }
 }
+
+TEST(CPU, EOR)
+{
+    uint8_t opcodes[] = { 0x49, 0x45, 0x55, 0x4D, 0x5D, 0x59, 0x41, 0x51 };
+    CPU cpu = CPU();
+    const uint8_t EXPECTED = 0xF0 ^ 0x0F;
+        
+    for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
+        print_opcode(opcodes[i]);
+        setup_cpu(cpu, MAPPING_MODES[opcodes[i]], false);
+        cpu.set_a(0xF0);
+        cpu.exec(opcodes[i]);
+        ASSERT_EQ(cpu.get_a(), EXPECTED);
+    }
+}
