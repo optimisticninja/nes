@@ -357,6 +357,15 @@ TEST(CPU, STY)
     }
 }
 
+TEST(CPU, TAX)
+{
+    CPU cpu = CPU();
+    const uint8_t EXPECTED = 0xFF;
+    cpu.set_a(EXPECTED);
+    cpu.exec(0xAA);
+    ASSERT_EQ(cpu.get_x(), EXPECTED);
+}
+
 TEST(CPU, ORA)
 {
     uint8_t opcodes[] = { 0x09, 0x05, 0x15, 0x0D, 0x1D, 0x19, 0x01, 0x11 };

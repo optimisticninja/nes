@@ -157,6 +157,12 @@ void CPU::sty(InstructionInfo& info)
     this->set_mem8(info.addr, this->regs.y);
 }
 
+void CPU::tax(__attribute__((unused)) InstructionInfo& info)
+{
+    handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.a);
+    this->regs.x = this->regs.a;
+}
+
 void CPU::sei(__attribute__((unused)) InstructionInfo& info)
 {
     this->regs.set_flag(FLAG_INTERRUPT);
