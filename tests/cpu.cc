@@ -4,6 +4,9 @@
 
 #include "../src/cpu.h"
 
+// TODO: Ensure flags work correctly on all instructions
+// TODO: Finish testing last few addressing modes
+
 void print_opcode(uint8_t opcode)
 {
     cout << "\t\t0x" << hex << uppercase << setfill('0') << setw(2) << unsigned(opcode) << endl;
@@ -499,6 +502,26 @@ TEST(Instructions, ASL)
     uint8_t opcodes[] = { 0x0A, 0x06, 0x16, 0x0E, 0x1E };
     CPU cpu = CPU();
     const uint8_t EXPECTED = 0x0F << 1;
+        
+    for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
+        print_opcode(opcodes[i]);
+        setup_cpu(cpu, MAPPING_MODES[opcodes[i]], false);
+        cpu.set_a(0x0F);
+        cpu.exec(opcodes[i]);
+        InstructionInfo info = cpu.get_curr_instr_info();
+        
+        if (info.mode == ACCUMULATOR)
+            ASSERT_EQ(cpu.get_a(), EXPECTED);
+        else
+            ASSERT_EQ(cpu.get_mem8(info.addr), EXPECTED);
+    }
+}
+
+TEST(Instructions, LSR)
+{
+    uint8_t opcodes[] = { 0x4A, 0x46, 0x56, 0x4E, 0x5E };
+    CPU cpu = CPU();
+    const uint8_t EXPECTED = 0x0F >> 1;
         
     for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
         print_opcode(opcodes[i]);

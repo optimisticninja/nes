@@ -169,6 +169,7 @@ private:
     
     /********** BITWISE ******************/
     void        asl(InstructionInfo& info);
+    void        lsr(InstructionInfo& info);
     void        ora(InstructionInfo& info);
     void        _and(InstructionInfo& info);
     void        eor(InstructionInfo& info);
@@ -201,8 +202,8 @@ public:
                 0,  &CPU::ora,         0, 0,         0,  &CPU::ora, &CPU::asl,         0, &CPU::clc,  &CPU::ora,         0, 0,         0,  &CPU::ora, &CPU::asl, 0, // 0x1F
                 0, &CPU::_and,         0, 0,         0, &CPU::_and,         0,         0, &CPU::plp, &CPU::_and,         0, 0,         0, &CPU::_and,         0, 0, // 0x2F
                 0, &CPU::_and,         0, 0,         0, &CPU::_and,         0,         0, &CPU::sec, &CPU::_and,         0, 0,         0, &CPU::_and,         0, 0, // 0x3F
-                0,  &CPU::eor,         0, 0,         0,  &CPU::eor,         0,         0, &CPU::pha,  &CPU::eor,         0, 0,         0,  &CPU::eor,         0, 0, // 0x4F
-                0,  &CPU::eor,         0, 0,         0,  &CPU::eor,         0,         0, &CPU::cli,  &CPU::eor,         0, 0,         0,  &CPU::eor,         0, 0, // 0x5F
+                0,  &CPU::eor,         0, 0,         0,  &CPU::eor, &CPU::lsr,         0, &CPU::pha,  &CPU::eor, &CPU::lsr, 0,         0,  &CPU::eor, &CPU::lsr, 0, // 0x4F
+                0,  &CPU::eor,         0, 0,         0,  &CPU::eor, &CPU::lsr,         0, &CPU::cli,  &CPU::eor,         0, 0,         0,  &CPU::eor, &CPU::lsr, 0, // 0x5F
                 0,  &CPU::adc,         0, 0,         0,  &CPU::adc,         0,         0, &CPU::pla,  &CPU::adc,         0, 0,         0,  &CPU::adc,         0, 0, // 0x6F
                 0,  &CPU::adc,         0, 0,         0,  &CPU::adc,         0,         0, &CPU::sei,  &CPU::adc,         0, 0,         0,  &CPU::adc,         0, 0, // 0x7F
                 0,  &CPU::sta,         0, 0, &CPU::sty,  &CPU::sta, &CPU::stx,         0, &CPU::dey,          0, &CPU::txa, 0, &CPU::sty,  &CPU::sta, &CPU::stx, 0, // 0x8F
