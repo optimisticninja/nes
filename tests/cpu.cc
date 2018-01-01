@@ -502,6 +502,28 @@ TEST(Instructions, DEC)
     }
 }
 
+TEST(Instructions, DEX)
+{
+    uint8_t opcode = 0xCA;
+    CPU cpu = CPU();
+    const uint8_t EXPECTED = 0xFE;
+    setup_cpu(cpu, MAPPING_MODES[opcode], false);
+    cpu.set_x(0xFF);
+    cpu.exec(opcode);
+    ASSERT_EQ(cpu.get_x(), EXPECTED);
+}
+
+TEST(Instructions, DEY)
+{
+    uint8_t opcode = 0x88;
+    CPU cpu = CPU();
+    const uint8_t EXPECTED = 0xFE;
+    setup_cpu(cpu, MAPPING_MODES[opcode], false);
+    cpu.set_y(0xFF);
+    cpu.exec(opcode);
+    ASSERT_EQ(cpu.get_y(), EXPECTED);
+}
+
 TEST(Instructions, SBC)
 {
     uint8_t opcodes[] = { 0xE9, 0xE5, 0xF5, 0xED, 0xFD, 0xF9, 0xE1, 0xF1 };

@@ -35,10 +35,10 @@ void CPU::exec(uint8_t opcode)
             //address = this->get_mem16_bug(this->get_mem16(this->regs.pc + 1));
             break;
         case INDIRECT_X:
-            address = (this->get_mem8(this->regs.pc + 1) + this->regs.x) & 0x00FF; // Ignore carry and wrap on zero page 
+            address = (this->mem[this->regs.pc + 1] + this->regs.x) & 0x00FF; // Ignore carry and wrap on zero page 
             break;
         case INDIRECT_Y:
-            address = this->get_mem16(this->get_mem8(this->regs.pc + 1)) + this->regs.y;
+            address = this->get_mem16(this->mem[this->regs.pc + 1]) + this->regs.y;
             break;
         case IMPLICIT:
             address = 0;
@@ -50,16 +50,16 @@ void CPU::exec(uint8_t opcode)
             address = this->regs.pc + 1;
             break;
         case ZERO:
-            address = this->get_mem8(this->regs.pc + 1);
+            address = this->mem[this->regs.pc + 1];
             break;
         case ZERO_X:
-            address = (this->get_mem8(this->regs.pc + 1) + this->regs.x)  & 0x00FF; // Ignore carry and wrap on zero page
+            address = (this->mem[this->regs.pc + 1] + this->regs.x)  & 0x00FF; // Ignore carry and wrap on zero page
             break;
         case ZERO_Y:
-            address = (this->get_mem8(this->regs.pc + 1) + this->regs.y)  & 0x00FF; // Ignore carry and wrap on zero page;
+            address = (this->mem[this->regs.pc + 1] + this->regs.y)  & 0x00FF; // Ignore carry and wrap on zero page;
             break;
         case RELATIVE: {
-            uint16_t offset = this->get_mem8(this->regs.pc + 1);
+            uint16_t offset = this->mem[this->regs.pc + 1];
             address = (offset < 0x80) 
                 ? this->regs.pc + 2 + offset
                 : this->regs.pc + 2 + offset - 0x100;
@@ -146,17 +146,17 @@ void CPU::nop(__attribute__((unused)) InstructionInfo& info)
 
 void CPU::sta(InstructionInfo& info)
 {
-    this->set_mem8(info.addr, this->regs.a);
+    this->mem[info.addr] = this->regs.a;
 }
 
 void CPU::stx(InstructionInfo& info)
 {
-    this->set_mem8(info.addr, this->regs.x);
+    this->mem[info.addr] = this->regs.x;
 }
 
 void CPU::sty(InstructionInfo& info)
 {
-    this->set_mem8(info.addr, this->regs.y);
+    this->mem[info.addr] = this->regs.y;
 }
 
 void CPU::tax(__attribute__((unused)) InstructionInfo& info)
@@ -217,44 +217,44 @@ void CPU::clc(__attribute((unused)) InstructionInfo& info)
 
 void CPU::lda(InstructionInfo& info)
 {
-    this->regs.a = this->get_mem8(info.addr);
+    this->regs.a = this->mem[info.addr];
     this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.a);
 }
 
 void CPU::ldx(InstructionInfo& info)
 {
-    this->regs.x = this->get_mem8(info.addr);
+    this->regs.x = this->mem[info.addr];
     this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.x);
 }
 
 void CPU::ldy(InstructionInfo& info)
 {
-    this->regs.y = this->get_mem8(info.addr);
+    this->regs.y = this->mem[info.addr];
     this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.y);
 }
 
 void CPU::ora(InstructionInfo& info)
 {
-    this->regs.a |= this->get_mem8(info.addr);
+    this->regs.a |= this->mem[info.addr];
     this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.a);
 }
 
 void CPU::_and(InstructionInfo& info)
 {
-    this->regs.a &= this->get_mem8(info.addr);
+    this->regs.a &= this->mem[info.addr];
     this->handle_flags(FLAG_ZERO  | FLAG_NEGATIVE, this->regs.a);
 }
 
 void CPU::eor(InstructionInfo& info)
 {
-    this->regs.a ^= this->get_mem8(info.addr);
+    this->regs.a ^= this->mem[info.addr];
     this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.a);
 }
 
 void CPU::adc(InstructionInfo& info)
 {
     uint8_t a = this->regs.a;
-    uint8_t b = this->get_mem8(info.addr);
+    uint8_t b = this->mem[info.addr];
     uint8_t c = this->get_p() & FLAG_CARRY;
     
     this->regs.a = a + b + c;
@@ -271,13 +271,26 @@ void CPU::adc(InstructionInfo& info)
 
 void CPU::dec(InstructionInfo& info)
 {
-    this->set_mem8(info.addr, this->get_mem8(info.addr) - 1);
+    this->mem[info.addr] = this->mem[info.addr] - 1;
+    this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->mem[info.addr]);
+}
+
+void CPU::dex(__attribute__((unused)) InstructionInfo& info)
+{
+    this->regs.x -= 1;
+    this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.x);
+}
+
+void CPU::dey(__attribute__((unused)) InstructionInfo& info)
+{
+    this->regs.y -= 1;
+    this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.y);
 }
 
 void CPU::sbc(InstructionInfo& info)
 {
     uint8_t a = this->regs.a;
-    uint8_t b = this->get_mem8(info.addr);
+    uint8_t b = this->mem[info.addr];
     uint8_t c = 1 - (this->get_p() & FLAG_CARRY);
     
     this->regs.a = a - b - c;
@@ -364,8 +377,8 @@ void CPU::set_mem8(size_t i, uint8_t val)
 
 uint16_t CPU::get_mem16(size_t i)
 {
-    uint16_t lo = this->get_mem8(i);
-    uint16_t hi = this->get_mem8(i + 1);
+    uint16_t lo = this->mem[i];
+    uint16_t hi = this->mem[i + 1];
     return hi << 8 | lo;
 }
 
