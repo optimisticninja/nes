@@ -176,6 +176,12 @@ private:
     void        iny(InstructionInfo& info);
     void        sbc(InstructionInfo& info);
     
+    /********** STACK ********************/
+    void        pha(InstructionInfo& info);
+    void        php(InstructionInfo& info);
+    void        pla(InstructionInfo& info);
+    void        plp(InstructionInfo& info);
+    
     /////////////////////////////////////////////////////////////////////////////////////////////
     
 public:
@@ -184,13 +190,13 @@ public:
     
     void (CPU::*opcodes[NUM_OPCODES])(InstructionInfo& info) = {
     /*         00          01         02 03         04          05         06         07         08          09         0A 0B         0C          0D         0E 0F  */
-        &CPU::brk,  &CPU::ora,         0, 0,         0,  &CPU::ora,         0,         0,         0,  &CPU::ora,         0, 0,         0,  &CPU::ora,         0, 0, // 0x00
+        &CPU::brk,  &CPU::ora,         0, 0,         0,  &CPU::ora,         0,         0, &CPU::php,  &CPU::ora,         0, 0,         0,  &CPU::ora,         0, 0, // 0x00
                 0,  &CPU::ora,         0, 0,         0,  &CPU::ora,         0,         0, &CPU::clc,  &CPU::ora,         0, 0,         0,  &CPU::ora,         0, 0, // 0x1F
-                0, &CPU::_and,         0, 0,         0, &CPU::_and,         0,         0,         0, &CPU::_and,         0, 0,         0, &CPU::_and,         0, 0, // 0x2F
+                0, &CPU::_and,         0, 0,         0, &CPU::_and,         0,         0, &CPU::plp, &CPU::_and,         0, 0,         0, &CPU::_and,         0, 0, // 0x2F
                 0, &CPU::_and,         0, 0,         0, &CPU::_and,         0,         0, &CPU::sec, &CPU::_and,         0, 0,         0, &CPU::_and,         0, 0, // 0x3F
-                0,  &CPU::eor,         0, 0,         0,  &CPU::eor,         0,         0,         0,  &CPU::eor,         0, 0,         0,  &CPU::eor,         0, 0, // 0x4F
+                0,  &CPU::eor,         0, 0,         0,  &CPU::eor,         0,         0, &CPU::pha,  &CPU::eor,         0, 0,         0,  &CPU::eor,         0, 0, // 0x4F
                 0,  &CPU::eor,         0, 0,         0,  &CPU::eor,         0,         0,         0,  &CPU::eor,         0, 0,         0,  &CPU::eor,         0, 0, // 0x5F
-                0,  &CPU::adc,         0, 0,         0,  &CPU::adc,         0,         0,         0,  &CPU::adc,         0, 0,         0,  &CPU::adc,         0, 0, // 0x6F
+                0,  &CPU::adc,         0, 0,         0,  &CPU::adc,         0,         0, &CPU::pla,  &CPU::adc,         0, 0,         0,  &CPU::adc,         0, 0, // 0x6F
                 0,  &CPU::adc,         0, 0,         0,  &CPU::adc,         0,         0, &CPU::sei,  &CPU::adc,         0, 0,         0,  &CPU::adc,         0, 0, // 0x7F
                 0,  &CPU::sta,         0, 0, &CPU::sty,  &CPU::sta, &CPU::stx,         0, &CPU::dey,          0, &CPU::txa, 0, &CPU::sty,  &CPU::sta, &CPU::stx, 0, // 0x8F
                 0,  &CPU::sta,         0, 0, &CPU::sty,  &CPU::sta, &CPU::stx,         0, &CPU::tya,  &CPU::sta, &CPU::txs, 0,         0,  &CPU::sta,         0, 0, // 0x9F
@@ -223,6 +229,7 @@ public:
     uint8_t     get_s();
     void        set_s(uint8_t s);
     uint8_t     get_p();
+    void        set_p(uint8_t p);
     
     uint8_t*    get_memptr(size_t i);
     uint8_t     get_mem8(size_t i);

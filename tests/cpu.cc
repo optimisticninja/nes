@@ -576,3 +576,47 @@ TEST(Instructions, SBC)
         ASSERT_EQ(cpu.get_a(), EXPECTED);
     }
 }
+
+TEST(Instructions, PHA)
+{
+    uint8_t opcode = 0x48;
+    CPU cpu = CPU();
+    const uint8_t EXPECTED = 0x0F;
+    setup_cpu(cpu, MAPPING_MODES[opcode], false);
+    cpu.set_a(EXPECTED);
+    cpu.exec(opcode);
+    ASSERT_EQ(cpu.pull8(), EXPECTED);
+}
+
+TEST(Instructions, PHP)
+{
+    uint8_t opcode = 0x08;
+    CPU cpu = CPU();
+    const uint8_t EXPECTED = FLAG_CARRY | FLAG_DECIMAL | FLAG_INTERRUPT;
+    setup_cpu(cpu, MAPPING_MODES[opcode], false);
+    cpu.set_p(EXPECTED);
+    cpu.exec(opcode);
+    ASSERT_EQ(cpu.pull8(), EXPECTED);
+}
+
+TEST(Instructions, PLA)
+{
+    uint8_t opcode = 0x68;
+    CPU cpu = CPU();
+    const uint8_t EXPECTED = 0x10;
+    setup_cpu(cpu, MAPPING_MODES[opcode], false);
+    cpu.push8(EXPECTED);
+    cpu.exec(opcode);
+    ASSERT_EQ(cpu.get_a(), EXPECTED);
+}
+
+TEST(Instructions, PLP)
+{
+    uint8_t opcode = 0x28;
+    CPU cpu = CPU();
+    const uint8_t EXPECTED = FLAG_CARRY | FLAG_NEGATIVE | FLAG_DECIMAL;
+    setup_cpu(cpu, MAPPING_MODES[opcode], false);
+    cpu.push8(EXPECTED);
+    cpu.exec(opcode);
+    ASSERT_EQ(cpu.get_p(), EXPECTED);
+}

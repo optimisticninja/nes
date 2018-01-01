@@ -323,6 +323,27 @@ void CPU::sbc(InstructionInfo& info)
         : this->regs.clear_flag(FLAG_OVERFLOW);
 }
 
+void CPU::pha(__attribute__((unused)) InstructionInfo& info)
+{
+    this->push8(this->regs.a);
+}
+
+void CPU::php(__attribute__((unused)) InstructionInfo& info)
+{
+    this->push8(this->regs.p);
+}
+
+void CPU::pla(__attribute__((unused)) InstructionInfo& info)
+{
+    this->regs.a = this->pull8();
+    this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.a);
+}
+
+void CPU::plp(__attribute__((unused)) InstructionInfo& info)
+{
+    this->regs.p = this->pull8();
+}
+
 uint8_t CPU::get_a()
 {
     return this->regs.a;
@@ -376,6 +397,11 @@ void CPU::set_s(uint8_t s)
 uint8_t CPU::get_p()
 {
     return this->regs.p;
+}
+
+void CPU::set_p(uint8_t p)
+{
+    this->regs.p = p;
 }
 
 uint8_t* CPU::get_memptr(size_t i)
