@@ -487,6 +487,21 @@ TEST(Instructions, ADC)
     }
 }
 
+TEST(Instructions, DEC)
+{
+    uint8_t opcodes[] = { 0xC6, 0xD6, 0xCE, 0xDE };
+    CPU cpu = CPU();
+    const uint8_t EXPECTED = 0x0E;
+        
+    for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
+        print_opcode(opcodes[i]);
+        setup_cpu(cpu, MAPPING_MODES[opcodes[i]], false);
+        cpu.exec(opcodes[i]);
+        InstructionInfo info = cpu.get_curr_instr_info();
+        ASSERT_EQ(cpu.get_mem8(info.addr), EXPECTED);
+    }
+}
+
 TEST(Instructions, SBC)
 {
     uint8_t opcodes[] = { 0xE9, 0xE5, 0xF5, 0xED, 0xFD, 0xF9, 0xE1, 0xF1 };

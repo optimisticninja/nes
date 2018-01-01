@@ -135,18 +135,6 @@ private:
     uint8_t*        cartridge_space = apu_io_test_mode + APU_IO_TEST_MODE_SIZE;
     InstructionInfo curr_instr_info;
     
-    void        clc(InstructionInfo& info);
-    void        cld(InstructionInfo& info);
-    void        nop(InstructionInfo& info);
-    void        brk(InstructionInfo& info);
-    void        lda(InstructionInfo& info);
-    void        ldx(InstructionInfo& info);
-    void        ldy(InstructionInfo& info);
-    void        ora(InstructionInfo& info);
-    void        _and(InstructionInfo& info);
-    void        eor(InstructionInfo& info);
-    void        sei(InstructionInfo& info);
-    void        sec(InstructionInfo& info);
     void        sta(InstructionInfo& info);
     void        stx(InstructionInfo& info);
     void        sty(InstructionInfo& info);
@@ -156,7 +144,24 @@ private:
     void        txa(InstructionInfo& info);
     void        txs(InstructionInfo& info);
     void        tya(InstructionInfo& info);
+    
+    void        clc(InstructionInfo& info);
+    void        cld(InstructionInfo& info);
+    void        sei(InstructionInfo& info);
+    void        sec(InstructionInfo& info);
+    
+    void        nop(InstructionInfo& info);
+    void        brk(InstructionInfo& info);
+    void        lda(InstructionInfo& info);
+    void        ldx(InstructionInfo& info);
+    void        ldy(InstructionInfo& info);
+    
+    void        ora(InstructionInfo& info);
+    void        _and(InstructionInfo& info);
+    void        eor(InstructionInfo& info);
+    
     void        adc(InstructionInfo& info);
+    void        dec(InstructionInfo& info);
     void        sbc(InstructionInfo& info);
 
     
@@ -178,8 +183,8 @@ public:
                 0,  &CPU::sta,         0, 0, &CPU::sty,  &CPU::sta, &CPU::stx,         0, &CPU::tya,  &CPU::sta, &CPU::txs, 0,         0,  &CPU::sta,         0, 0, // 0x9F
         &CPU::ldy,  &CPU::lda, &CPU::ldx, 0, &CPU::ldy,  &CPU::lda, &CPU::ldx,         0, &CPU::tay,  &CPU::lda, &CPU::tax, 0, &CPU::ldy,  &CPU::lda, &CPU::ldx, 0, // 0xAF
                 0,  &CPU::lda,         0, 0, &CPU::ldy,  &CPU::lda, &CPU::ldx,         0,         0,  &CPU::lda, &CPU::tsx, 0, &CPU::ldy,  &CPU::lda, &CPU::ldx, 0, // 0xBF
-                0,          0,         0, 0,         0,          0,         0,         0,         0,          0,         0, 0,         0,          0,         0, 0, // 0xCF
-                0,          0,         0, 0,         0,          0,         0,         0, &CPU::cld,          0,         0, 0,         0,          0,         0, 0, // 0xDF
+                0,          0,         0, 0,         0,          0, &CPU::dec,         0,         0,          0,         0, 0,         0,          0, &CPU::dec, 0, // 0xCF
+                0,          0,         0, 0,         0,          0, &CPU::dec,         0, &CPU::cld,          0,         0, 0,         0,          0, &CPU::dec, 0, // 0xDF
                 0,  &CPU::sbc,         0, 0,         0,  &CPU::sbc,         0,         0,         0,  &CPU::sbc, &CPU::nop, 0,         0,  &CPU::sbc,         0, 0, // 0xEF
                 0,  &CPU::sbc,         0, 0,         0,  &CPU::sbc,         0,         0,         0,  &CPU::sbc,         0, 0,         0,  &CPU::sbc,         0, 0  // 0xFF
     };

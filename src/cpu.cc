@@ -269,6 +269,11 @@ void CPU::adc(InstructionInfo& info)
         : this->regs.clear_flag(FLAG_OVERFLOW);
 }
 
+void CPU::dec(InstructionInfo& info)
+{
+    this->set_mem8(info.addr, this->get_mem8(info.addr) - 1);
+}
+
 void CPU::sbc(InstructionInfo& info)
 {
     uint8_t a = this->regs.a;
