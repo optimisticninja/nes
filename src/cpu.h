@@ -164,8 +164,10 @@ private:
     void        dec(InstructionInfo& info);
     void        dex(InstructionInfo& info);
     void        dey(InstructionInfo& info);
+    void        inc(InstructionInfo& info);
+    void        inx(InstructionInfo& info);
+    void        iny(InstructionInfo& info);
     void        sbc(InstructionInfo& info);
-
     
 public:
     CPU();
@@ -185,10 +187,10 @@ public:
                 0,  &CPU::sta,         0, 0, &CPU::sty,  &CPU::sta, &CPU::stx,         0, &CPU::tya,  &CPU::sta, &CPU::txs, 0,         0,  &CPU::sta,         0, 0, // 0x9F
         &CPU::ldy,  &CPU::lda, &CPU::ldx, 0, &CPU::ldy,  &CPU::lda, &CPU::ldx,         0, &CPU::tay,  &CPU::lda, &CPU::tax, 0, &CPU::ldy,  &CPU::lda, &CPU::ldx, 0, // 0xAF
                 0,  &CPU::lda,         0, 0, &CPU::ldy,  &CPU::lda, &CPU::ldx,         0,         0,  &CPU::lda, &CPU::tsx, 0, &CPU::ldy,  &CPU::lda, &CPU::ldx, 0, // 0xBF
-                0,          0,         0, 0,         0,          0, &CPU::dec,         0,         0,          0, &CPU::dex, 0,         0,          0, &CPU::dec, 0, // 0xCF
+                0,          0,         0, 0,         0,          0, &CPU::dec,         0, &CPU::iny,          0, &CPU::dex, 0,         0,          0, &CPU::dec, 0, // 0xCF
                 0,          0,         0, 0,         0,          0, &CPU::dec,         0, &CPU::cld,          0,         0, 0,         0,          0, &CPU::dec, 0, // 0xDF
-                0,  &CPU::sbc,         0, 0,         0,  &CPU::sbc,         0,         0,         0,  &CPU::sbc, &CPU::nop, 0,         0,  &CPU::sbc,         0, 0, // 0xEF
-                0,  &CPU::sbc,         0, 0,         0,  &CPU::sbc,         0,         0,         0,  &CPU::sbc,         0, 0,         0,  &CPU::sbc,         0, 0  // 0xFF
+                0,  &CPU::sbc,         0, 0,         0,  &CPU::sbc, &CPU::inc,         0, &CPU::inx,  &CPU::sbc, &CPU::nop, 0,         0,  &CPU::sbc, &CPU::inc, 0, // 0xEF
+                0,  &CPU::sbc,         0, 0,         0,  &CPU::sbc, &CPU::inc,         0,         0,  &CPU::sbc,         0, 0,         0,  &CPU::sbc, &CPU::inc, 0  // 0xFF
     };
 
     void        exec(uint8_t opcode);

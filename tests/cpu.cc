@@ -524,6 +524,43 @@ TEST(Instructions, DEY)
     ASSERT_EQ(cpu.get_y(), EXPECTED);
 }
 
+TEST(Instructions, INC)
+{
+    uint8_t opcodes[] = { 0xE6, 0xF6, 0xEE, 0xFE };
+    CPU cpu = CPU();
+    const uint8_t EXPECTED = 0x10;
+        
+    for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
+        print_opcode(opcodes[i]);
+        setup_cpu(cpu, MAPPING_MODES[opcodes[i]], false);
+        cpu.exec(opcodes[i]);
+        InstructionInfo info = cpu.get_curr_instr_info();
+        ASSERT_EQ(cpu.get_mem8(info.addr), EXPECTED);
+    }
+}
+
+TEST(Instructions, INX)
+{
+    uint8_t opcode = 0xE8;
+    CPU cpu = CPU();
+    const uint8_t EXPECTED = 0x10;
+    setup_cpu(cpu, MAPPING_MODES[opcode], false);
+    cpu.set_x(0x0F);
+    cpu.exec(opcode);
+    ASSERT_EQ(cpu.get_x(), EXPECTED);
+}
+
+TEST(Instructions, INY)
+{
+    uint8_t opcode = 0xC8;
+    CPU cpu = CPU();
+    const uint8_t EXPECTED = 0x10;
+    setup_cpu(cpu, MAPPING_MODES[opcode], false);
+    cpu.set_y(0x0F);
+    cpu.exec(opcode);
+    ASSERT_EQ(cpu.get_y(), EXPECTED);
+}
+
 TEST(Instructions, SBC)
 {
     uint8_t opcodes[] = { 0xE9, 0xE5, 0xF5, 0xED, 0xFD, 0xF9, 0xE1, 0xF1 };

@@ -271,7 +271,7 @@ void CPU::adc(InstructionInfo& info)
 
 void CPU::dec(InstructionInfo& info)
 {
-    this->mem[info.addr] = this->mem[info.addr] - 1;
+    this->mem[info.addr] -= 1;
     this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->mem[info.addr]);
 }
 
@@ -284,6 +284,24 @@ void CPU::dex(__attribute__((unused)) InstructionInfo& info)
 void CPU::dey(__attribute__((unused)) InstructionInfo& info)
 {
     this->regs.y -= 1;
+    this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.y);
+}
+
+void CPU::inc(InstructionInfo& info)
+{
+    this->mem[info.addr] += 1;
+    this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->mem[info.addr]);
+}
+
+void CPU::inx(__attribute__((unused)) InstructionInfo& info)
+{
+    this->regs.x += 1;
+    this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.x);
+}
+
+void CPU::iny(__attribute__((unused)) InstructionInfo& info)
+{
+    this->regs.y += 1;
     this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.y);
 }
 
