@@ -205,6 +205,11 @@ void CPU::sec(__attribute__((unused)) InstructionInfo& info)
     this->regs.set_flag(FLAG_CARRY);
 }
 
+void CPU::sed(__attribute__((unused)) InstructionInfo& info)
+{
+    this->regs.set_flag(FLAG_DECIMAL);
+}
+
 void CPU::cld(__attribute__((unused)) InstructionInfo& info)
 {
     this->regs.clear_flag(FLAG_DECIMAL);

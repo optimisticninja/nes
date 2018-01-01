@@ -142,8 +142,9 @@ private:
     void        cld(InstructionInfo& info);
     void        cli(InstructionInfo& info);
     void        clv(InstructionInfo& info);
-    void        sei(InstructionInfo& info);
     void        sec(InstructionInfo& info);
+    void        sed(InstructionInfo& info);
+    void        sei(InstructionInfo& info);
     
     /********** SYSTEM *******************/
     void        nop(InstructionInfo& info);
@@ -207,7 +208,7 @@ public:
                 0,          0,         0, 0,         0,          0, &CPU::dec,         0, &CPU::iny,          0, &CPU::dex, 0,         0,          0, &CPU::dec, 0, // 0xCF
                 0,          0,         0, 0,         0,          0, &CPU::dec,         0, &CPU::cld,          0,         0, 0,         0,          0, &CPU::dec, 0, // 0xDF
                 0,  &CPU::sbc,         0, 0,         0,  &CPU::sbc, &CPU::inc,         0, &CPU::inx,  &CPU::sbc, &CPU::nop, 0,         0,  &CPU::sbc, &CPU::inc, 0, // 0xEF
-                0,  &CPU::sbc,         0, 0,         0,  &CPU::sbc, &CPU::inc,         0,         0,  &CPU::sbc,         0, 0,         0,  &CPU::sbc, &CPU::inc, 0  // 0xFF
+                0,  &CPU::sbc,         0, 0,         0,  &CPU::sbc, &CPU::inc,         0, &CPU::sed,  &CPU::sbc,         0, 0,         0,  &CPU::sbc, &CPU::inc, 0  // 0xFF
     };
 
     void        exec(uint8_t opcode);

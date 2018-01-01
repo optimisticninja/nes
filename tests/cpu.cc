@@ -266,6 +266,13 @@ TEST(Instructions, SEC)
     ASSERT_EQ(cpu.get_p() & FLAG_CARRY, FLAG_CARRY);
 }
 
+TEST(Instructions, SED)
+{
+    CPU cpu = CPU();
+    cpu.exec(0xF8);
+    ASSERT_EQ(cpu.get_p() & FLAG_DECIMAL, FLAG_DECIMAL);
+}
+
 TEST(Instructions, CLC)
 {
     CPU cpu = CPU();
