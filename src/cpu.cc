@@ -215,6 +215,16 @@ void CPU::clc(__attribute((unused)) InstructionInfo& info)
     this->regs.clear_flag(FLAG_CARRY);
 }
 
+void CPU::cli(__attribute__((unused)) InstructionInfo& info)
+{
+    this->regs.clear_flag(FLAG_INTERRUPT);
+}
+
+void CPU::clv(__attribute__((unused)) InstructionInfo& info)
+{
+    this->regs.clear_flag(FLAG_OVERFLOW);
+}
+
 void CPU::lda(InstructionInfo& info)
 {
     this->regs.a = this->mem[info.addr];

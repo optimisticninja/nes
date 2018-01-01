@@ -282,6 +282,22 @@ TEST(Instructions, CLD)
     ASSERT_EQ(cpu.get_p() & FLAG_DECIMAL, false);
 }
 
+TEST(Instructions, CLI)
+{
+    CPU cpu = CPU();
+    cpu.set_flag(FLAG_INTERRUPT); // Set flag to make sure it is cleared on call
+    cpu.exec(0x58);
+    ASSERT_EQ(cpu.get_p() & FLAG_INTERRUPT, false);
+}
+
+TEST(Instructions, CLV)
+{
+    CPU cpu = CPU();
+    cpu.set_flag(FLAG_OVERFLOW); // Set flag to make sure it is cleared on call
+    cpu.exec(0xB8);
+    ASSERT_EQ(cpu.get_p() & FLAG_OVERFLOW, false);
+}
+
 TEST(Instructions, LDA)
 {
     uint8_t opcodes[] = { 0xA9, 0xA5, 0xB5, 0xAD, 0xBD, 0xB9, 0xA1, 0xB1 };
