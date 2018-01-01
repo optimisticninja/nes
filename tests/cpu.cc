@@ -243,7 +243,7 @@ TEST(CPU, Stack)
     ASSERT_EQ(cpu.pull16(), 0xFFFD);
 }
 
-TEST(CPU, BRK)
+TEST(Instructions, BRK)
 {
     CPU cpu = CPU();
     cpu.exec(0x00);
@@ -252,21 +252,37 @@ TEST(CPU, BRK)
     ASSERT_EQ(cpu.pull16(), 1);
 }
 
-TEST(CPU, SEI)
+TEST(Instructions, SEI)
 {
     CPU cpu = CPU();
     cpu.exec(0x78);
     ASSERT_EQ(cpu.get_p() & FLAG_INTERRUPT, FLAG_INTERRUPT);
 }
 
-TEST(CPU, CLD)
+TEST(Instructions, SEC)
 {
     CPU cpu = CPU();
+    cpu.exec(0x38);
+    ASSERT_EQ(cpu.get_p() & FLAG_CARRY, FLAG_CARRY);
+}
+
+TEST(Instructions, CLC)
+{
+    CPU cpu = CPU();
+    cpu.set_flag(FLAG_CARRY); // Set flag to make sure it is cleared on call
+    cpu.exec(0x18);
+    ASSERT_EQ(cpu.get_p() & FLAG_DECIMAL, false);
+}
+
+TEST(Instructions, CLD)
+{
+    CPU cpu = CPU();
+    cpu.set_flag(FLAG_DECIMAL); // Set flag to make sure it is cleared on call
     cpu.exec(0xD8);
     ASSERT_EQ(cpu.get_p() & FLAG_DECIMAL, false);
 }
 
-TEST(CPU, LDA)
+TEST(Instructions, LDA)
 {
     uint8_t opcodes[] = { 0xA9, 0xA5, 0xB5, 0xAD, 0xBD, 0xB9, 0xA1, 0xB1 };
     CPU cpu = CPU();
@@ -280,7 +296,7 @@ TEST(CPU, LDA)
     }
 }
 
-TEST(CPU, LDX)
+TEST(Instructions, LDX)
 {
     uint8_t opcodes[] = { 0xA2, 0xA6, 0xB6, 0xAE, 0xBE };
     CPU cpu = CPU();
@@ -294,7 +310,7 @@ TEST(CPU, LDX)
     }
 }
 
-TEST(CPU, LDY)
+TEST(Instructions, LDY)
 {
     uint8_t opcodes[] = { 0xA0, 0xA4, 0xB4, 0xAC, 0xBC };
     CPU cpu = CPU();
@@ -308,7 +324,7 @@ TEST(CPU, LDY)
     }
 }
 
-TEST(CPU, STA)
+TEST(Instructions, STA)
 {
     uint8_t opcodes[] = { 0x85, 0x95, 0x8D, 0x9D, 0x99, 0x81, 0x91 };
     CPU cpu = CPU();
@@ -324,7 +340,7 @@ TEST(CPU, STA)
     }
 }
 
-TEST(CPU, STX)
+TEST(Instructions, STX)
 {
     uint8_t opcodes[] = { 0x86, 0x96, 0x8E };
     CPU cpu = CPU();
@@ -340,7 +356,7 @@ TEST(CPU, STX)
     }
 }
 
-TEST(CPU, STY)
+TEST(Instructions, STY)
 {
     uint8_t opcodes[] = { 0x84, 0x94, 0x8C };
     CPU cpu = CPU();
@@ -356,7 +372,7 @@ TEST(CPU, STY)
     }
 }
 
-TEST(CPU, TAX)
+TEST(Instructions, TAX)
 {
     CPU cpu = CPU();
     const uint8_t EXPECTED = 0xFF;
@@ -365,7 +381,7 @@ TEST(CPU, TAX)
     ASSERT_EQ(cpu.get_x(), EXPECTED);
 }
 
-TEST(CPU, TAY)
+TEST(Instructions, TAY)
 {
     CPU cpu = CPU();
     const uint8_t EXPECTED = 0xFF;
@@ -374,7 +390,7 @@ TEST(CPU, TAY)
     ASSERT_EQ(cpu.get_y(), EXPECTED);
 }
 
-TEST(CPU, TSX)
+TEST(Instructions, TSX)
 {
     CPU cpu = CPU();
     const uint8_t EXPECTED = 0xFF;
@@ -383,7 +399,7 @@ TEST(CPU, TSX)
     ASSERT_EQ(cpu.get_x(), EXPECTED);
 }
 
-TEST(CPU, TXA)
+TEST(Instructions, TXA)
 {
     CPU cpu = CPU();
     const uint8_t EXPECTED = 0xFF;
@@ -392,7 +408,7 @@ TEST(CPU, TXA)
     ASSERT_EQ(cpu.get_a(), EXPECTED);
 }
 
-TEST(CPU, TXS)
+TEST(Instructions, TXS)
 {
     CPU cpu = CPU();
     const uint8_t EXPECTED = 0xFF;
@@ -401,7 +417,7 @@ TEST(CPU, TXS)
     ASSERT_EQ(cpu.get_s(), EXPECTED);
 }
 
-TEST(CPU, TYA)
+TEST(Instructions, TYA)
 {
     CPU cpu = CPU();
     const uint8_t EXPECTED = 0xFF;
@@ -410,7 +426,7 @@ TEST(CPU, TYA)
     ASSERT_EQ(cpu.get_a(), EXPECTED);
 }
 
-TEST(CPU, ORA)
+TEST(Instructions, ORA)
 {
     uint8_t opcodes[] = { 0x09, 0x05, 0x15, 0x0D, 0x1D, 0x19, 0x01, 0x11 };
     CPU cpu = CPU();
@@ -425,7 +441,7 @@ TEST(CPU, ORA)
     }
 }
 
-TEST(CPU, AND)
+TEST(Instructions, AND)
 {
     uint8_t opcodes[] = { 0x29, 0x25, 0x35, 0x2D, 0x3D, 0x39, 0x21, 0x31 };
     CPU cpu = CPU();
@@ -440,7 +456,7 @@ TEST(CPU, AND)
     }
 }
 
-TEST(CPU, EOR)
+TEST(Instructions, EOR)
 {
     uint8_t opcodes[] = { 0x49, 0x45, 0x55, 0x4D, 0x5D, 0x59, 0x41, 0x51 };
     CPU cpu = CPU();
@@ -455,7 +471,7 @@ TEST(CPU, EOR)
     }
 }
 
-TEST(CPU, ADC)
+TEST(Instructions, ADC)
 {
     uint8_t opcodes[] = { 0x69, 0x65, 0x75, 0x6D, 0x7D, 0x79, 0x61, 0x71 };
     CPU cpu = CPU();
@@ -464,7 +480,24 @@ TEST(CPU, ADC)
     for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
         print_opcode(opcodes[i]);
         setup_cpu(cpu, MAPPING_MODES[opcodes[i]], false);
+        cpu.clear_flag(FLAG_CARRY); // Emulate calling CLC like a proper ADC call would
         cpu.set_a(0xF0);
+        cpu.exec(opcodes[i]);
+        ASSERT_EQ(cpu.get_a(), EXPECTED);
+    }
+}
+
+TEST(Instructions, SBC)
+{
+    uint8_t opcodes[] = { 0xE9, 0xE5, 0xF5, 0xED, 0xFD, 0xF9, 0xE1, 0xF1 };
+    CPU cpu = CPU();
+    const uint8_t EXPECTED = 0xFF - 0x0F;
+        
+    for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
+        print_opcode(opcodes[i]);
+        setup_cpu(cpu, MAPPING_MODES[opcodes[i]], false);
+        cpu.set_flag(FLAG_CARRY); // Emulate calling SEC like a proper SBC call would
+        cpu.set_a(0xFF);
         cpu.exec(opcodes[i]);
         ASSERT_EQ(cpu.get_a(), EXPECTED);
     }

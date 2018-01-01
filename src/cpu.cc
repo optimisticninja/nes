@@ -200,9 +200,19 @@ void CPU::sei(__attribute__((unused)) InstructionInfo& info)
     this->regs.set_flag(FLAG_INTERRUPT);
 }
 
+void CPU::sec(__attribute__((unused)) InstructionInfo& info)
+{
+    this->regs.set_flag(FLAG_CARRY);
+}
+
 void CPU::cld(__attribute__((unused)) InstructionInfo& info)
 {
     this->regs.clear_flag(FLAG_DECIMAL);
+}
+
+void CPU::clc(__attribute((unused)) InstructionInfo& info)
+{
+    this->regs.clear_flag(FLAG_CARRY);
 }
 
 void CPU::lda(InstructionInfo& info)
@@ -255,6 +265,24 @@ void CPU::adc(InstructionInfo& info)
         : this->regs.clear_flag(FLAG_CARRY);
     
     ((a ^ b) & 0x80) == 0 && ((a ^ this->regs.a) & 0x80) != 0 
+        ? this->regs.set_flag(FLAG_OVERFLOW) 
+        : this->regs.clear_flag(FLAG_OVERFLOW);
+}
+
+void CPU::sbc(InstructionInfo& info)
+{
+    uint8_t a = this->regs.a;
+    uint8_t b = this->get_mem8(info.addr);
+    uint8_t c = 1 - (this->get_p() & FLAG_CARRY);
+    
+    this->regs.a = a - b - c;
+    this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.a);
+    
+    (int) (a - b - c) >= 0x00
+        ? this->regs.set_flag(FLAG_CARRY) 
+        : this->regs.clear_flag(FLAG_CARRY);
+    
+    ((a ^ b) & 0x80) != 0 && ((a ^ this->regs.a) & 0x80) != 0 
         ? this->regs.set_flag(FLAG_OVERFLOW) 
         : this->regs.clear_flag(FLAG_OVERFLOW);
 }
@@ -389,4 +417,14 @@ uint8_t* CPU::get_ram()
 InstructionInfo CPU::get_curr_instr_info()
 {
     return this->curr_instr_info;
+}
+
+void CPU::clear_flag(Flag flag)
+{
+    this->regs.clear_flag(flag);
+}
+
+void CPU::set_flag(Flag flag)
+{
+    this->regs.set_flag(flag);
 }

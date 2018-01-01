@@ -135,6 +135,7 @@ private:
     uint8_t*        cartridge_space = apu_io_test_mode + APU_IO_TEST_MODE_SIZE;
     InstructionInfo curr_instr_info;
     
+    void        clc(InstructionInfo& info);
     void        cld(InstructionInfo& info);
     void        nop(InstructionInfo& info);
     void        brk(InstructionInfo& info);
@@ -145,6 +146,7 @@ private:
     void        _and(InstructionInfo& info);
     void        eor(InstructionInfo& info);
     void        sei(InstructionInfo& info);
+    void        sec(InstructionInfo& info);
     void        sta(InstructionInfo& info);
     void        stx(InstructionInfo& info);
     void        sty(InstructionInfo& info);
@@ -155,6 +157,8 @@ private:
     void        txs(InstructionInfo& info);
     void        tya(InstructionInfo& info);
     void        adc(InstructionInfo& info);
+    void        sbc(InstructionInfo& info);
+
     
 public:
     CPU();
@@ -163,9 +167,9 @@ public:
     void (CPU::*opcodes[NUM_OPCODES])(InstructionInfo& info) = {
     /*         00          01         02 03         04          05         06         07         08          09         0A 0B         0C          0D         0E 0F  */
         &CPU::brk,  &CPU::ora,         0, 0,         0,  &CPU::ora,         0,         0,         0,  &CPU::ora,         0, 0,         0,  &CPU::ora,         0, 0, // 0x00
-                0,  &CPU::ora,         0, 0,         0,  &CPU::ora,         0,         0,         0,  &CPU::ora,         0, 0,         0,  &CPU::ora,         0, 0, // 0x1F
+                0,  &CPU::ora,         0, 0,         0,  &CPU::ora,         0,         0, &CPU::clc,  &CPU::ora,         0, 0,         0,  &CPU::ora,         0, 0, // 0x1F
                 0, &CPU::_and,         0, 0,         0, &CPU::_and,         0,         0,         0, &CPU::_and,         0, 0,         0, &CPU::_and,         0, 0, // 0x2F
-                0, &CPU::_and,         0, 0,         0, &CPU::_and,         0,         0,         0, &CPU::_and,         0, 0,         0, &CPU::_and,         0, 0, // 0x3F
+                0, &CPU::_and,         0, 0,         0, &CPU::_and,         0,         0, &CPU::sec, &CPU::_and,         0, 0,         0, &CPU::_and,         0, 0, // 0x3F
                 0,  &CPU::eor,         0, 0,         0,  &CPU::eor,         0,         0,         0,  &CPU::eor,         0, 0,         0,  &CPU::eor,         0, 0, // 0x4F
                 0,  &CPU::eor,         0, 0,         0,  &CPU::eor,         0,         0,         0,  &CPU::eor,         0, 0,         0,  &CPU::eor,         0, 0, // 0x5F
                 0,  &CPU::adc,         0, 0,         0,  &CPU::adc,         0,         0,         0,  &CPU::adc,         0, 0,         0,  &CPU::adc,         0, 0, // 0x6F
@@ -176,8 +180,8 @@ public:
                 0,  &CPU::lda,         0, 0, &CPU::ldy,  &CPU::lda, &CPU::ldx,         0,         0,  &CPU::lda, &CPU::tsx, 0, &CPU::ldy,  &CPU::lda, &CPU::ldx, 0, // 0xBF
                 0,          0,         0, 0,         0,          0,         0,         0,         0,          0,         0, 0,         0,          0,         0, 0, // 0xCF
                 0,          0,         0, 0,         0,          0,         0,         0, &CPU::cld,          0,         0, 0,         0,          0,         0, 0, // 0xDF
-                0,          0,         0, 0,         0,          0,         0,         0,         0,          0, &CPU::nop, 0,         0,          0,         0, 0, // 0xEF
-                0,          0,         0, 0,         0,          0,         0,         0,         0,          0,         0, 0,         0,          0,         0, 0  // 0xFF
+                0,  &CPU::sbc,         0, 0,         0,  &CPU::sbc,         0,         0,         0,  &CPU::sbc, &CPU::nop, 0,         0,  &CPU::sbc,         0, 0, // 0xEF
+                0,  &CPU::sbc,         0, 0,         0,  &CPU::sbc,         0,         0,         0,  &CPU::sbc,         0, 0,         0,  &CPU::sbc,         0, 0  // 0xFF
     };
 
     void        exec(uint8_t opcode);
@@ -217,6 +221,9 @@ public:
     uint8_t*    get_apu_io_regs();
     uint8_t*    get_apu_io_test_mode();
     uint8_t*    get_cartridge_space();
+    
+    void        clear_flag(Flag flag);
+    void        set_flag(Flag flag);
     
     InstructionInfo get_curr_instr_info();
 };
