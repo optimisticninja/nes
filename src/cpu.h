@@ -135,6 +135,19 @@ private:
     uint8_t*        cartridge_space = apu_io_test_mode + APU_IO_TEST_MODE_SIZE;
     InstructionInfo curr_instr_info;
     
+    ///////////////////////////////////// INSTRUCTIONS ///////////////////////////////////////////
+    
+    /********* REGISTERS *****************/
+    void        clc(InstructionInfo& info);
+    void        cld(InstructionInfo& info);
+    void        sei(InstructionInfo& info);
+    void        sec(InstructionInfo& info);
+    
+    /********** SYSTEM *******************/
+    void        nop(InstructionInfo& info);
+    void        brk(InstructionInfo& info);
+    
+    /********** STORAGE ******************/
     void        sta(InstructionInfo& info);
     void        stx(InstructionInfo& info);
     void        sty(InstructionInfo& info);
@@ -144,22 +157,16 @@ private:
     void        txa(InstructionInfo& info);
     void        txs(InstructionInfo& info);
     void        tya(InstructionInfo& info);
-    
-    void        clc(InstructionInfo& info);
-    void        cld(InstructionInfo& info);
-    void        sei(InstructionInfo& info);
-    void        sec(InstructionInfo& info);
-    
-    void        nop(InstructionInfo& info);
-    void        brk(InstructionInfo& info);
     void        lda(InstructionInfo& info);
     void        ldx(InstructionInfo& info);
     void        ldy(InstructionInfo& info);
     
+    /********** BITWISE ******************/
     void        ora(InstructionInfo& info);
     void        _and(InstructionInfo& info);
     void        eor(InstructionInfo& info);
     
+    /********** MATH *********************/
     void        adc(InstructionInfo& info);
     void        dec(InstructionInfo& info);
     void        dex(InstructionInfo& info);
@@ -168,6 +175,8 @@ private:
     void        inx(InstructionInfo& info);
     void        iny(InstructionInfo& info);
     void        sbc(InstructionInfo& info);
+    
+    /////////////////////////////////////////////////////////////////////////////////////////////
     
 public:
     CPU();
