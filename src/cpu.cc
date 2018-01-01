@@ -245,6 +245,34 @@ void CPU::cmp(InstructionInfo& info)
     this->handle_flags(FLAG_NEGATIVE, a - m);
 }
 
+void CPU::cpx(InstructionInfo& info)
+{
+    uint8_t x = this->regs.x;
+    uint8_t m = this->mem[info.addr];
+    
+    if (x >= m)
+        this->sec(info);
+    
+    if (x == m)
+        this->set_flag(FLAG_ZERO);
+    
+    this->handle_flags(FLAG_NEGATIVE, x - m);
+}
+
+void CPU::cpy(InstructionInfo& info)
+{
+    uint8_t y = this->regs.y;
+    uint8_t m = this->mem[info.addr];
+    
+    if (y >= m)
+        this->sec(info);
+    
+    if (y == m)
+        this->set_flag(FLAG_ZERO);
+    
+    this->handle_flags(FLAG_NEGATIVE, y - m);
+}
+
 void CPU::lda(InstructionInfo& info)
 {
     this->regs.a = this->mem[info.addr];

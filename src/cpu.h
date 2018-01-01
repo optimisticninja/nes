@@ -146,6 +146,8 @@ private:
     void        sed(InstructionInfo& info);
     void        sei(InstructionInfo& info);
     void        cmp(InstructionInfo& info);
+    void        cpx(InstructionInfo& info);
+    void        cpy(InstructionInfo& info);
     
     /********** SYSTEM *******************/
     void        nop(InstructionInfo& info);
@@ -206,9 +208,9 @@ public:
                 0,  &CPU::sta,         0, 0, &CPU::sty,  &CPU::sta, &CPU::stx,         0, &CPU::tya,  &CPU::sta, &CPU::txs, 0,         0,  &CPU::sta,         0, 0, // 0x9F
         &CPU::ldy,  &CPU::lda, &CPU::ldx, 0, &CPU::ldy,  &CPU::lda, &CPU::ldx,         0, &CPU::tay,  &CPU::lda, &CPU::tax, 0, &CPU::ldy,  &CPU::lda, &CPU::ldx, 0, // 0xAF
                 0,  &CPU::lda,         0, 0, &CPU::ldy,  &CPU::lda, &CPU::ldx,         0, &CPU::clv,  &CPU::lda, &CPU::tsx, 0, &CPU::ldy,  &CPU::lda, &CPU::ldx, 0, // 0xBF
-                0,  &CPU::cmp,         0, 0,         0,  &CPU::cmp, &CPU::dec,         0, &CPU::iny,  &CPU::cmp, &CPU::dex, 0,         0,  &CPU::cmp, &CPU::dec, 0, // 0xCF
+        &CPU::cpy,  &CPU::cmp,         0, 0, &CPU::cpy,  &CPU::cmp, &CPU::dec,         0, &CPU::iny,  &CPU::cmp, &CPU::dex, 0, &CPU::cpy,  &CPU::cmp, &CPU::dec, 0, // 0xCF
                 0,  &CPU::cmp,         0, 0,         0,  &CPU::cmp, &CPU::dec,         0, &CPU::cld,  &CPU::cmp,         0, 0,         0,  &CPU::cmp, &CPU::dec, 0, // 0xDF
-                0,  &CPU::sbc,         0, 0,         0,  &CPU::sbc, &CPU::inc,         0, &CPU::inx,  &CPU::sbc, &CPU::nop, 0,         0,  &CPU::sbc, &CPU::inc, 0, // 0xEF
+        &CPU::cpx,  &CPU::sbc,         0, 0, &CPU::cpx,  &CPU::sbc, &CPU::inc,         0, &CPU::inx,  &CPU::sbc, &CPU::nop, 0, &CPU::cpx,  &CPU::sbc, &CPU::inc, 0, // 0xEF
                 0,  &CPU::sbc,         0, 0,         0,  &CPU::sbc, &CPU::inc,         0, &CPU::sed,  &CPU::sbc,         0, 0,         0,  &CPU::sbc, &CPU::inc, 0  // 0xFF
     };
 
