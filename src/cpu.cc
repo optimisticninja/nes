@@ -291,6 +291,25 @@ void CPU::ldy(InstructionInfo& info)
     this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.y);
 }
 
+void CPU::asl(InstructionInfo& info)
+{
+    int a = (info.mode == ACCUMULATOR) ? this->regs.a : this->mem[info.addr];
+    cout << "a: " << a << endl;
+    if (a & (1 << 7))
+        this->set_flag(FLAG_CARRY);
+    
+    a <<= 1;
+        cout << "a: " << a << endl;
+
+    if (info.mode == ACCUMULATOR) {
+        this->regs.a <<= 1;
+        this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.a);
+    } else {
+        this->mem[info.addr] = a;
+        this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->mem[info.addr]);
+    }
+}
+
 void CPU::ora(InstructionInfo& info)
 {
     this->regs.a |= this->mem[info.addr];

@@ -168,6 +168,7 @@ private:
     void        ldy(InstructionInfo& info);
     
     /********** BITWISE ******************/
+    void        asl(InstructionInfo& info);
     void        ora(InstructionInfo& info);
     void        _and(InstructionInfo& info);
     void        eor(InstructionInfo& info);
@@ -196,8 +197,8 @@ public:
     
     void (CPU::*opcodes[NUM_OPCODES])(InstructionInfo& info) = {
     /*         00          01         02 03         04          05         06         07         08          09         0A 0B         0C          0D         0E 0F  */
-        &CPU::brk,  &CPU::ora,         0, 0,         0,  &CPU::ora,         0,         0, &CPU::php,  &CPU::ora,         0, 0,         0,  &CPU::ora,         0, 0, // 0x00
-                0,  &CPU::ora,         0, 0,         0,  &CPU::ora,         0,         0, &CPU::clc,  &CPU::ora,         0, 0,         0,  &CPU::ora,         0, 0, // 0x1F
+        &CPU::brk,  &CPU::ora,         0, 0,         0,  &CPU::ora, &CPU::asl,         0, &CPU::php,  &CPU::ora, &CPU::asl, 0,         0,  &CPU::ora, &CPU::asl, 0, // 0x00
+                0,  &CPU::ora,         0, 0,         0,  &CPU::ora, &CPU::asl,         0, &CPU::clc,  &CPU::ora,         0, 0,         0,  &CPU::ora, &CPU::asl, 0, // 0x1F
                 0, &CPU::_and,         0, 0,         0, &CPU::_and,         0,         0, &CPU::plp, &CPU::_and,         0, 0,         0, &CPU::_and,         0, 0, // 0x2F
                 0, &CPU::_and,         0, 0,         0, &CPU::_and,         0,         0, &CPU::sec, &CPU::_and,         0, 0,         0, &CPU::_and,         0, 0, // 0x3F
                 0,  &CPU::eor,         0, 0,         0,  &CPU::eor,         0,         0, &CPU::pha,  &CPU::eor,         0, 0,         0,  &CPU::eor,         0, 0, // 0x4F

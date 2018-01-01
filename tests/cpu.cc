@@ -494,6 +494,26 @@ TEST(Instructions, TYA)
     ASSERT_EQ(cpu.get_a(), EXPECTED);
 }
 
+TEST(Instructions, ASL)
+{
+    uint8_t opcodes[] = { 0x0A, 0x06, 0x16, 0x0E, 0x1E };
+    CPU cpu = CPU();
+    const uint8_t EXPECTED = 0x0F << 1;
+        
+    for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
+        print_opcode(opcodes[i]);
+        setup_cpu(cpu, MAPPING_MODES[opcodes[i]], false);
+        cpu.set_a(0x0F);
+        cpu.exec(opcodes[i]);
+        InstructionInfo info = cpu.get_curr_instr_info();
+        
+        if (info.mode == ACCUMULATOR)
+            ASSERT_EQ(cpu.get_a(), EXPECTED);
+        else
+            ASSERT_EQ(cpu.get_mem8(info.addr), EXPECTED);
+    }
+}
+
 TEST(Instructions, ORA)
 {
     uint8_t opcodes[] = { 0x09, 0x05, 0x15, 0x0D, 0x1D, 0x19, 0x01, 0x11 };
