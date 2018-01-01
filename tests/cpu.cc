@@ -305,6 +305,8 @@ TEST(Instructions, CLV)
     ASSERT_EQ(cpu.get_p() & FLAG_OVERFLOW, false);
 }
 
+/* TODO: Test CMP */
+
 TEST(Instructions, LDA)
 {
     uint8_t opcodes[] = { 0xA9, 0xA5, 0xB5, 0xAD, 0xBD, 0xB9, 0xA1, 0xB1 };

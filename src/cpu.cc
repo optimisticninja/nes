@@ -195,29 +195,20 @@ void CPU::tya(__attribute__((unused)) InstructionInfo& info)
     this->regs.a = this->regs.y;
 }
 
-void CPU::sei(__attribute__((unused)) InstructionInfo& info)
-{
-    this->regs.set_flag(FLAG_INTERRUPT);
-}
-
-void CPU::sec(__attribute__((unused)) InstructionInfo& info)
-{
-    this->regs.set_flag(FLAG_CARRY);
-}
 
 void CPU::sed(__attribute__((unused)) InstructionInfo& info)
 {
     this->regs.set_flag(FLAG_DECIMAL);
 }
 
-void CPU::cld(__attribute__((unused)) InstructionInfo& info)
-{
-    this->regs.clear_flag(FLAG_DECIMAL);
-}
-
 void CPU::clc(__attribute((unused)) InstructionInfo& info)
 {
     this->regs.clear_flag(FLAG_CARRY);
+}
+
+void CPU::cld(__attribute__((unused)) InstructionInfo& info)
+{
+    this->regs.clear_flag(FLAG_DECIMAL);
 }
 
 void CPU::cli(__attribute__((unused)) InstructionInfo& info)
@@ -228,6 +219,30 @@ void CPU::cli(__attribute__((unused)) InstructionInfo& info)
 void CPU::clv(__attribute__((unused)) InstructionInfo& info)
 {
     this->regs.clear_flag(FLAG_OVERFLOW);
+}
+
+void CPU::sei(__attribute__((unused)) InstructionInfo& info)
+{
+    this->regs.set_flag(FLAG_INTERRUPT);
+}
+
+void CPU::sec(__attribute__((unused)) InstructionInfo& info)
+{
+    this->regs.set_flag(FLAG_CARRY);
+}
+
+void CPU::cmp(InstructionInfo& info)
+{
+    uint8_t a = this->regs.a;
+    uint8_t m = this->mem[info.addr];
+    
+    if (a >= m)
+        this->sec(info);
+    
+    if (a == m)
+        this->set_flag(FLAG_ZERO);
+    
+    this->handle_flags(FLAG_NEGATIVE, a - m);
 }
 
 void CPU::lda(InstructionInfo& info)
