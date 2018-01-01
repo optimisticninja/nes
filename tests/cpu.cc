@@ -305,7 +305,21 @@ TEST(Instructions, CLV)
     ASSERT_EQ(cpu.get_p() & FLAG_OVERFLOW, false);
 }
 
-/* TODO: Test CMP */
+TEST(Instructions, CMP)
+{
+    uint8_t opcodes[] = { 0xC9, 0xC5, 0xD5, 0xCD, 0xDD, 0xD9, 0xC1, 0xD1 };
+    CPU cpu = CPU();
+    
+    
+    for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
+        print_opcode(opcodes[i]);
+        setup_cpu(cpu, MAPPING_MODES[opcodes[i]], false);
+        cpu.set_a(0x0F);
+        cpu.exec(opcodes[i]);
+        ASSERT_EQ(cpu.get_p() & FLAG_CARRY, FLAG_CARRY); // Test carry flag and zero
+        ASSERT_EQ(cpu.get_p() & FLAG_ZERO, FLAG_ZERO); // Test carry flag and zero
+    }
+}
 
 TEST(Instructions, LDA)
 {
