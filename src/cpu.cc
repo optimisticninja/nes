@@ -344,6 +344,56 @@ void CPU::eor(InstructionInfo& info)
     this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.a);
 }
 
+void CPU::rol(InstructionInfo& info)
+{
+    uint8_t a = (info.mode == ACCUMULATOR) ? this->regs.a : this->mem[info.addr];
+    
+    if (a & (1 << 7))
+        this->set_flag(FLAG_CARRY);
+    else
+        this->clear_flag(FLAG_CARRY);
+    
+    a <<= 1;
+    
+    if (this->regs.p & FLAG_CARRY)
+        a |= FLAG_CARRY;
+    else
+        a &= ~FLAG_CARRY;
+
+    if (info.mode == ACCUMULATOR) {
+        this->regs.a = a;
+        this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.a);
+    } else {
+        this->mem[info.addr] = a;
+        this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->mem[info.addr]);
+    }
+}
+
+void CPU::ror(InstructionInfo& info)
+{
+    uint8_t a = (info.mode == ACCUMULATOR) ? this->regs.a : this->mem[info.addr];
+    
+    if (a & (1 << 7))
+        this->set_flag(FLAG_CARRY);
+    else
+        this->clear_flag(FLAG_CARRY);
+    
+    a >>= 1;
+    
+    if (this->regs.p & FLAG_CARRY)
+        a |= FLAG_CARRY;
+    else
+        a &= ~FLAG_CARRY;
+
+    if (info.mode == ACCUMULATOR) {
+        this->regs.a = a;
+        this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->regs.a);
+    } else {
+        this->mem[info.addr] = a;
+        this->handle_flags(FLAG_ZERO | FLAG_NEGATIVE, this->mem[info.addr]);
+    }
+}
+
 void CPU::adc(InstructionInfo& info)
 {
     uint8_t a = this->regs.a;

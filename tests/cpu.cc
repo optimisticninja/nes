@@ -582,6 +582,47 @@ TEST(Instructions, EOR)
     }
 }
 
+TEST(Instructions, ROL)
+{
+    uint8_t opcodes[] = { 0x2A, 0x26, 0x36, 0x2E, 0x3E };
+    CPU cpu = CPU();
+    const uint8_t EXPECTED = 0x0F << 1;
+        
+    for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
+        print_opcode(opcodes[i]);
+        setup_cpu(cpu, MAPPING_MODES[opcodes[i]], false);
+        cpu.set_a(0x0F);
+        cpu.exec(opcodes[i]);
+        InstructionInfo info = cpu.get_curr_instr_info();
+        
+        if (info.mode == ACCUMULATOR)
+            ASSERT_EQ(cpu.get_a(), EXPECTED);
+        else
+            ASSERT_EQ(cpu.get_mem8(info.addr), EXPECTED);
+    }
+}
+
+TEST(Instructions, ROR)
+{
+    uint8_t opcodes[] = { 0x6A, 0x66, 0x76, 0x6E, 0x7E };
+    CPU cpu = CPU();
+    const uint8_t EXPECTED = 0xFF >> 1;
+        
+    for (unsigned i = 0; i < sizeof(opcodes) / sizeof(uint8_t); i++) {
+        print_opcode(opcodes[i]);
+        setup_cpu(cpu, MAPPING_MODES[opcodes[i]], false);
+        //cpu.set_flag(FLAG_CARRY);
+        cpu.set_a(0xff);
+        cpu.exec(opcodes[i]);
+        InstructionInfo info = cpu.get_curr_instr_info();
+        
+        if (info.mode == ACCUMULATOR)
+            ASSERT_EQ(cpu.get_a(), EXPECTED);
+        else
+            ASSERT_EQ(cpu.get_mem8(info.addr), EXPECTED);
+    }
+}
+
 TEST(Instructions, ADC)
 {
     uint8_t opcodes[] = { 0x69, 0x65, 0x75, 0x6D, 0x7D, 0x79, 0x61, 0x71 };

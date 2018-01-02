@@ -173,6 +173,8 @@ private:
     void        ora(InstructionInfo& info);
     void        _and(InstructionInfo& info);
     void        eor(InstructionInfo& info);
+    void        rol(InstructionInfo& info);
+    void        ror(InstructionInfo& info);
     
     /********** MATH *********************/
     void        adc(InstructionInfo& info);
@@ -200,12 +202,12 @@ public:
     /*         00          01         02 03         04          05         06         07         08          09         0A 0B         0C          0D         0E 0F  */
         &CPU::brk,  &CPU::ora,         0, 0,         0,  &CPU::ora, &CPU::asl,         0, &CPU::php,  &CPU::ora, &CPU::asl, 0,         0,  &CPU::ora, &CPU::asl, 0, // 0x00
                 0,  &CPU::ora,         0, 0,         0,  &CPU::ora, &CPU::asl,         0, &CPU::clc,  &CPU::ora,         0, 0,         0,  &CPU::ora, &CPU::asl, 0, // 0x1F
-                0, &CPU::_and,         0, 0,         0, &CPU::_and,         0,         0, &CPU::plp, &CPU::_and,         0, 0,         0, &CPU::_and,         0, 0, // 0x2F
-                0, &CPU::_and,         0, 0,         0, &CPU::_and,         0,         0, &CPU::sec, &CPU::_and,         0, 0,         0, &CPU::_and,         0, 0, // 0x3F
+                0, &CPU::_and,         0, 0,         0, &CPU::_and, &CPU::rol,         0, &CPU::plp, &CPU::_and, &CPU::rol, 0,         0, &CPU::_and, &CPU::rol, 0, // 0x2F
+                0, &CPU::_and,         0, 0,         0, &CPU::_and, &CPU::rol,         0, &CPU::sec, &CPU::_and,         0, 0,         0, &CPU::_and, &CPU::rol, 0, // 0x3F
                 0,  &CPU::eor,         0, 0,         0,  &CPU::eor, &CPU::lsr,         0, &CPU::pha,  &CPU::eor, &CPU::lsr, 0,         0,  &CPU::eor, &CPU::lsr, 0, // 0x4F
                 0,  &CPU::eor,         0, 0,         0,  &CPU::eor, &CPU::lsr,         0, &CPU::cli,  &CPU::eor,         0, 0,         0,  &CPU::eor, &CPU::lsr, 0, // 0x5F
-                0,  &CPU::adc,         0, 0,         0,  &CPU::adc,         0,         0, &CPU::pla,  &CPU::adc,         0, 0,         0,  &CPU::adc,         0, 0, // 0x6F
-                0,  &CPU::adc,         0, 0,         0,  &CPU::adc,         0,         0, &CPU::sei,  &CPU::adc,         0, 0,         0,  &CPU::adc,         0, 0, // 0x7F
+                0,  &CPU::adc,         0, 0,         0,  &CPU::adc, &CPU::ror,         0, &CPU::pla,  &CPU::adc, &CPU::ror, 0,         0,  &CPU::adc, &CPU::ror, 0, // 0x6F
+                0,  &CPU::adc,         0, 0,         0,  &CPU::adc, &CPU::ror,         0, &CPU::sei,  &CPU::adc,         0, 0,         0,  &CPU::adc, &CPU::ror, 0, // 0x7F
                 0,  &CPU::sta,         0, 0, &CPU::sty,  &CPU::sta, &CPU::stx,         0, &CPU::dey,          0, &CPU::txa, 0, &CPU::sty,  &CPU::sta, &CPU::stx, 0, // 0x8F
                 0,  &CPU::sta,         0, 0, &CPU::sty,  &CPU::sta, &CPU::stx,         0, &CPU::tya,  &CPU::sta, &CPU::txs, 0,         0,  &CPU::sta,         0, 0, // 0x9F
         &CPU::ldy,  &CPU::lda, &CPU::ldx, 0, &CPU::ldy,  &CPU::lda, &CPU::ldx,         0, &CPU::tay,  &CPU::lda, &CPU::tax, 0, &CPU::ldy,  &CPU::lda, &CPU::ldx, 0, // 0xAF
